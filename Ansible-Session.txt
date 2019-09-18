@@ -1,0 +1,2659 @@
+Ansible session:
+1. Centos 5.5 -> Ansible 2.3.1
+2. Network automation more efficient in Ansible. there are modules available
+3. Idempotent in ansible needs clarification
+4. Ansible host can handle 1250 nodes at a time (depending on the ulimit value of server)
+5. Ansible failover plan can be done for cluster config
+
+Ansible Lab
+6. change hostname
+7. add entry in hosts file
+   19  hostnamectl set-hostname ansnode1.cnl.com
+   20  hostnaeme -f
+   21  hostname -f
+   22  cat /etc/hosts
+   23  vi /etc/hosts
+   24  hostnamectl set-hostname ansiblehost.cnl.com
+   25  vi /etc/hosts
+   26  ping ansiblenode1
+   27  ping ansiblevm1
+   28  ping ansiblenode2
+
+## Access using putty   
+8. Enable password authentication in /etc/ssh/sshd_config
+9. Create user ansible and set password
+10. Add entry in visudo for sudo access
+10a. service sshd restart
+
+11. disable firewalld for linux and centos
+    9  iptables -L - check firewall rules
+   11  systemctl status firewalld - firewall status
+   12  systemctl stop firewalld - firewall stop
+   
+12 Disable selinux temporary;y
+[root@ansiblevm1 ~]# getenforce
+Enforcing
+[root@ansiblevm1 ~]# setenforce 0
+[root@ansiblevm1 ~]# getenforce
+Permissive
+[root@ansiblevm1 ~]# 
+
+13. update epel-release and install ansible
+yum install epel-release -y
+yum install ansible -y
+
+14. create .vimrc in home path
+set ai
+set tabstop=2
+set expandtab
+
+then execute source .vimrc to 
+
+
+15. Generate ssh key for host vm and copy to nodes
+   11  ssh-keygen
+   13  ssh-copy-id ansiblenode1
+   14  ssh-copy-id ansiblenode2
+
+16. Ansible version 2.7.5, python version sud be > 2.6
+
+17. create ansible.cfg file specific to environment
+18. create hosts file, and add the file name into the cfg file
+
+19. Privilege escaltion needs o be compied into local cfg
+
+20. Default directory pre-cendence
+/etc/ansible
+next user defined ansible path
+
+21. yaml entry and exit will be required in exam point of view
+---
+...
+
+22. Destination adhoc command verify
+ ansible all -m command -a "command to execute"
+ ansible all -m shell -a "ls -l /var/tmp/ ; echo 'command 2' ; ls -l /var/tmp/sample_dir" -vv
+ 
+23. indentaion sud be disabled in vi for copy-paste from np and np++
+24. with_items, with_dict and with_
+
+25. ansible-galaxy init <playbook role name>, run this command to create dirs structure inside roles dir
+[ansible@ansiblevm1 roles]$ ansible-galaxy init myplays
+- myplays was created successfully
+[ansible@ansiblevm1 roles]$ tree myplays/
+myplays/
+├── defaults
+│   └── main.yml
+├── files
+├── handlers
+│   └── main.yml
+├── meta
+│   └── main.yml
+├── README.md
+├── tasks
+│   └── main.yml
+├── templates
+├── tests
+│   ├── inventory
+│   └── test.yml
+└── vars
+    └── main.yml
+
+8 directories, 8 files
+=======================
+Windows
+1. create vm
+2. set password: UP[Nz^F%#51?s6!
+3. run the ps script available to setup ansiblw in client#
+4. install pip and winrm
+1001  sudo yum install python2-pip -y
+ 1002  sudo pip install "pywinrm>=0.2.2"
+5. change password in read format
+======================
+26. Ansible tower
+Free and licensed
+tower maintained by awx
+ansible twoer tar will be sent by ansible team once we set 
+after login license will be asked.
+ 
+ ==========================
+ login as: ansible
+ansible@35.231.75.161's password:
+Last login: Sat Jan  5 17:27:08 2019 from 157.51.250.97
+[ansible@ansiblehost ~]$
+[ansible@ansiblehost ~]$
+[ansible@ansiblehost ~]$
+[ansible@ansiblehost ~]$ ls
+ansible_playbooks  dev  prod  test
+[ansible@ansiblehost ~]$ cd dev
+[ansible@ansiblehost dev]$
+[ansible@ansiblehost dev]$
+[ansible@ansiblehost dev]$ ls
+ansible.cfg  ansiblerun.log  file.yml  jolly  playbooks  sample.txt
+[ansible@ansiblehost dev]$ cat file.yml
+---
+- name: Create a file into client nodes
+  hosts: localhost
+  tasks:
+   - name: Create file
+     file:
+      path: /home/ansible/sample.txt
+      state: touch
+[ansible@ansiblehost dev]$ ansible-playbook file.yml --syntax
+
+playbook: file.yml
+[ansible@ansiblehost dev]$ vi file.yml
+[ansible@ansiblehost dev]$ ansible-playbook file.yml --vv
+Usage: ansible-playbook [options] playbook.yml [playbook2 ...]
+
+ansible-playbook: error: no such option: --vv
+[ansible@ansiblehost dev]$ ansible-playbook file.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: file.yml *****************************************************************************************************************************************************
+1 plays in file.yml
+
+PLAY [Create a file into client nodes] *********************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/file.yml:2
+ok: [localhost]
+META: ran handlers
+
+TASK [Create file] *****************************************************************************************************************************************************
+task path: /home/ansible/dev/file.yml:5
+changed: [localhost] => {"changed": true, "dest": "/home/ansible/sample2.txt", "gid": 0, "group": "root", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:user_home_t:s0", "size": 0, "state": "file", "uid": 0}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+localhost                  : ok=2    changed=1    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$
+[ansible@ansiblehost dev]$
+[ansible@ansiblehost dev]$
+[ansible@ansiblehost dev]$ vi copyfile.yml
+[ansible@ansiblehost dev]$ ls -l /
+total 16
+lrwxrwxrwx.  1 root root    7 Dec 10 19:10 bin -> usr/bin
+dr-xr-xr-x.  5 root root 4096 Dec 10 19:15 boot
+drwxr-xr-x. 17 root root 2860 Jan  5 06:38 dev
+drwxr-xr-x. 77 root root 8192 Jan  5 07:05 etc
+drwxr-xr-x.  4 root root   41 Jan  5 06:24 home
+lrwxrwxrwx.  1 root root    7 Dec 10 19:10 lib -> usr/lib
+lrwxrwxrwx.  1 root root    9 Dec 10 19:10 lib64 -> usr/lib64
+drwxr-xr-x.  2 root root    6 Apr 11  2018 media
+drwxr-xr-x.  2 root root    6 Apr 11  2018 mnt
+drwxr-xr-x.  2 root root    6 Apr 11  2018 opt
+dr-xr-xr-x. 93 root root    0 Jan  5 06:38 proc
+dr-xr-x---.  5 root root  171 Jan  5 06:54 root
+drwxr-xr-x. 25 root root  740 Jan  6 05:13 run
+lrwxrwxrwx.  1 root root    8 Dec 10 19:10 sbin -> usr/sbin
+drwxr-xr-x.  2 root root    6 Apr 11  2018 srv
+dr-xr-xr-x. 13 root root    0 Jan  5 06:38 sys
+drwxrwxrwt.  8 root root  172 Jan  6 05:15 tmp
+drwxr-xr-x. 13 root root  155 Dec 10 19:10 usr
+drwxr-xr-x. 18 root root  254 Dec 24 18:16 var
+[ansible@ansiblehost dev]$ ls
+ansible.cfg  ansiblerun.log  copyfile.yml  file.yml  jolly  playbooks  sample.txt
+[ansible@ansiblehost dev]$ vi bkup-sudo.yml
+[ansible@ansiblehost dev]$ ansible-playbook bkup-sudo.yml --syntax
+ERROR! 'src' is not a valid attribute for a Task
+
+The error appears to have been in '/home/ansible/dev/bkup-sudo.yml': line 5, column 6, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+  tasks:
+   - name: Backup sudo file
+     ^ here
+
+This error can be suppressed as a warning using the "invalid_task_attribute_failed" configuration
+[ansible@ansiblehost dev]$ vi bkup-sudo.yml
+[ansible@ansiblehost dev]$ ansible-playbook bkup-sudo.yml -C
+ERROR! 'src' is not a valid attribute for a Task
+
+The error appears to have been in '/home/ansible/dev/bkup-sudo.yml': line 5, column 6, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+  tasks:
+   - name: Backup sudo file
+     ^ here
+
+This error can be suppressed as a warning using the "invalid_task_attribute_failed" configuration
+[ansible@ansiblehost dev]$ vi bkup-sudo.yml
+[ansible@ansiblehost dev]$ ansible-playbook bkup-sudo.yml -C
+
+PLAY [Backup sudo file in remote node] *********************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+ok: [ansiblenode1]
+ok: [ansiblenode2]
+
+TASK [Backup sudo file] ************************************************************************************************************************************************
+changed: [ansiblenode1]
+changed: [ansiblenode2]
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=2    changed=1    unreachable=0    failed=0
+ansiblenode2               : ok=2    changed=1    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ ansible-playbook bkup-sudo.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: bkup-sudo.yml ************************************************************************************************************************************************
+1 plays in bkup-sudo.yml
+
+PLAY [Backup sudo file in remote node] *********************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/bkup-sudo.yml:2
+ok: [ansiblenode1]
+ok: [ansiblenode2]
+META: ran handlers
+
+TASK [Backup sudo file] ************************************************************************************************************************************************
+task path: /home/ansible/dev/bkup-sudo.yml:5
+changed: [ansiblenode1] => {"changed": true, "checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "dest": "/var/tmp/sudoers.bk", "gid": 0, "group": "root", "md5sum": "5b9d5274ddab6f8e9cebbd2d09f4fa08", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:user_tmp_t:s0", "size": 4366, "src": "/etc/sudoers", "state": "file", "uid": 0}
+changed: [ansiblenode2] => {"changed": true, "checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "dest": "/var/tmp/sudoers.bk", "gid": 0, "group": "root", "md5sum": "5b9d5274ddab6f8e9cebbd2d09f4fa08", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:user_tmp_t:s0", "size": 4366, "src": "/etc/sudoers", "state": "file", "uid": 0}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=2    changed=1    unreachable=0    failed=0
+ansiblenode2               : ok=2    changed=1    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ vi fetch.yml
+[ansible@ansiblehost dev]$ ansible-playbook fetch.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: fetch.yml ****************************************************************************************************************************************************
+1 plays in fetch.yml
+
+PLAY [Fetch remote sudoer file to local] *******************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/fetch.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Fetch sudoers file from remote node] *****************************************************************************************************************************
+task path: /home/ansible/dev/fetch.yml:5
+changed: [ansiblenode2] => {"changed": true, "checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "dest": "/var/tmp/sudoers.bk", "md5sum": "5b9d5274ddab6f8e9cebbd2d09f4fa08", "remote_checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "remote_md5sum": null}
+ok: [ansiblenode1] => {"changed": false, "checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "dest": "/var/tmp/sudoers.bk", "file": "/var/tmp/sudoers.bk", "md5sum": "5b9d5274ddab6f8e9cebbd2d09f4fa08"}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=2    changed=0    unreachable=0    failed=0
+ansiblenode2               : ok=2    changed=1    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ ls -ltr
+total 152
+-rw-rw-r--. 1 ansible ansible   155 Jan  5 10:08 ansible.cfg
+-rw-rw-r--. 1 ansible ansible    65 Jan  5 11:35 jolly
+-rw-r--r--. 1 root    root        0 Jan  5 11:53 sample.txt
+drwxrwxr-x. 2 ansible ansible    72 Jan  5 11:55 playbooks
+-rw-rw-r--. 1 ansible ansible   163 Jan  6 04:51 file.yml
+-rw-rw-r--. 1 ansible ansible    11 Jan  6 05:15 copyfile.yml
+-rw-rw-r--. 1 ansible ansible   183 Jan  6 05:31 bkup-sudo.yml
+-rw-rw-r--. 1 ansible ansible   196 Jan  6 05:33 fetch.yml
+-rw-rw-r--. 1 ansible ansible 75222 Jan  6 05:33 ansiblerun.log
+[ansible@ansiblehost dev]$
+login as: ansible
+ansible@35.231.75.161's password:
+Last login: Sun Jan  6 04:49:51 2019 from 210.18.181.195
+[ansible@ansiblehost ~]$
+[ansible@ansiblehost ~]$
+[ansible@ansiblehost ~]$ cd dev
+[ansible@ansiblehost dev]$ ls
+ansible.cfg  ansiblerun.log  bkup-sudo.yml  copyfile.yml  fetch.yml  file.yml  jolly  playbooks  sample.txt
+[ansible@ansiblehost dev]$ cp fetch.yml fetch2.yml
+[ansible@ansiblehost dev]$ vi fetch2.yml
+[ansible@ansiblehost dev]$  ansible-playbook fetch2.yml -C
+
+PLAY [Fetch remote sudoer file to local] *******************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+
+TASK [Fetch sudoers file from remote node] *****************************************************************************************************************************
+skipping: [ansiblenode1]
+skipping: [ansiblenode2]
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=1    changed=0    unreachable=0    failed=0
+ansiblenode2               : ok=1    changed=0    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$  ansible-playbook fetch2.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: fetch2.yml ***************************************************************************************************************************************************
+1 plays in fetch2.yml
+
+PLAY [Fetch remote sudoer file to local] *******************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/fetch2.yml:2
+ok: [ansiblenode1]
+ok: [ansiblenode2]
+META: ran handlers
+
+TASK [Fetch sudoers file from remote node] *****************************************************************************************************************************
+task path: /home/ansible/dev/fetch2.yml:5
+changed: [ansiblenode2] => {"changed": true, "checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "dest": "/var/tmp/ansiblenode2/var/tmp/sudoers.bk", "md5sum": "5b9d5274ddab6f8e9cebbd2d09f4fa08", "remote_checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "remote_md5sum": null}
+changed: [ansiblenode1] => {"changed": true, "checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "dest": "/var/tmp/ansiblenode1/var/tmp/sudoers.bk", "md5sum": "5b9d5274ddab6f8e9cebbd2d09f4fa08", "remote_checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "remote_md5sum": null}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=2    changed=1    unreachable=0    failed=0
+ansiblenode2               : ok=2    changed=1    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ vi fetch2.yml
+[ansible@ansiblehost dev]$  ansible-playbook fetch2.yml -C
+
+PLAY [Fetch remote sudoer file to local] *******************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+
+TASK [Fetch sudoers file from remote node] *****************************************************************************************************************************
+skipping: [ansiblenode1]
+skipping: [ansiblenode2]
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=1    changed=0    unreachable=0    failed=0
+ansiblenode2               : ok=1    changed=0    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$  ansible-playbook fetch2.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: fetch2.yml ***************************************************************************************************************************************************
+1 plays in fetch2.yml
+
+PLAY [Fetch remote sudoer file to local] *******************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/fetch2.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Fetch sudoers file from remote node] *****************************************************************************************************************************
+task path: /home/ansible/dev/fetch2.yml:5
+changed: [ansiblenode2] => {"changed": true, "checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "dest": "/var/tmp/prefix-ansiblenode2", "md5sum": "5b9d5274ddab6f8e9cebbd2d09f4fa08", "remote_checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "remote_md5sum": null}
+changed: [ansiblenode1] => {"changed": true, "checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "dest": "/var/tmp/prefix-ansiblenode1", "md5sum": "5b9d5274ddab6f8e9cebbd2d09f4fa08", "remote_checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "remote_md5sum": null}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=2    changed=1    unreachable=0    failed=0
+ansiblenode2               : ok=2    changed=1    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ vi fetch2.yml
+[ansible@ansiblehost dev]$  ansible-playbook fetch2.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: fetch2.yml ***************************************************************************************************************************************************
+1 plays in fetch2.yml
+
+PLAY [Fetch remote sudoer file to local] *******************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/fetch2.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Fetch sudoers file from remote node] *****************************************************************************************************************************
+task path: /home/ansible/dev/fetch2.yml:5
+changed: [ansiblenode2] => {"changed": true, "checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "dest": "/var/tmp/sudoers.bk-ansiblenode2", "md5sum": "5b9d5274ddab6f8e9cebbd2d09f4fa08", "remote_checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "remote_md5sum": null}
+changed: [ansiblenode1] => {"changed": true, "checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "dest": "/var/tmp/sudoers.bk-ansiblenode1", "md5sum": "5b9d5274ddab6f8e9cebbd2d09f4fa08", "remote_checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "remote_md5sum": null}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=2    changed=1    unreachable=0    failed=0
+ansiblenode2               : ok=2    changed=1    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ ls -ltr
+total 156
+-rw-rw-r--. 1 ansible ansible   155 Jan  5 10:08 ansible.cfg
+-rw-rw-r--. 1 ansible ansible    65 Jan  5 11:35 jolly
+-rw-r--r--. 1 root    root        0 Jan  5 11:53 sample.txt
+drwxrwxr-x. 2 ansible ansible    72 Jan  5 11:55 playbooks
+-rw-rw-r--. 1 ansible ansible   163 Jan  6 04:51 file.yml
+-rw-rw-r--. 1 ansible ansible    11 Jan  6 05:15 copyfile.yml
+-rw-rw-r--. 1 ansible ansible   183 Jan  6 05:31 bkup-sudo.yml
+-rw-rw-r--. 1 ansible ansible   196 Jan  6 05:33 fetch.yml
+-rw-rw-r--. 1 ansible ansible   231 Jan  6 05:49 fetch2.yml
+-rw-rw-r--. 1 ansible ansible 88117 Jan  6 05:50 ansiblerun.log
+[ansible@ansiblehost dev]$ ll
+total 156
+-rw-rw-r--. 1 ansible ansible   155 Jan  5 10:08 ansible.cfg
+-rw-rw-r--. 1 ansible ansible 88117 Jan  6 05:50 ansiblerun.log
+-rw-rw-r--. 1 ansible ansible   183 Jan  6 05:31 bkup-sudo.yml
+-rw-rw-r--. 1 ansible ansible    11 Jan  6 05:15 copyfile.yml
+-rw-rw-r--. 1 ansible ansible   231 Jan  6 05:49 fetch2.yml
+-rw-rw-r--. 1 ansible ansible   196 Jan  6 05:33 fetch.yml
+-rw-rw-r--. 1 ansible ansible   163 Jan  6 04:51 file.yml
+-rw-rw-r--. 1 ansible ansible    65 Jan  5 11:35 jolly
+drwxrwxr-x. 2 ansible ansible    72 Jan  5 11:55 playbooks
+-rw-r--r--. 1 root    root        0 Jan  5 11:53 sample.txt
+[ansible@ansiblehost dev]$ cat fetch
+fetch2.yml  fetch.yml
+[ansible@ansiblehost dev]$ cat fetch^C
+[ansible@ansiblehost dev]$ mv fetch2.yml fetch_with_node.yml
+[ansible@ansiblehost dev]$  ansible-playbook fetch_with_node.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: fetch_with_node.yml ******************************************************************************************************************************************
+1 plays in fetch_with_node.yml
+
+PLAY [Fetch remote sudoer file to local] *******************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/fetch_with_node.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Fetch sudoers file from remote node] *****************************************************************************************************************************
+task path: /home/ansible/dev/fetch_with_node.yml:5
+ok: [ansiblenode1] => {"changed": false, "checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "dest": "/var/tmp/sudoers.bk-ansiblenode1", "file": "/var/tmp/sudoers.bk", "md5sum": "5b9d5274ddab6f8e9cebbd2d09f4fa08"}
+ok: [ansiblenode2] => {"changed": false, "checksum": "a14808977a772597a63544d5edf696bd58ebc70b", "dest": "/var/tmp/sudoers.bk-ansiblenode2", "file": "/var/tmp/sudoers.bk", "md5sum": "5b9d5274ddab6f8e9cebbd2d09f4fa08"}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=2    changed=0    unreachable=0    failed=0
+ansiblenode2               : ok=2    changed=0    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ ls -ltr
+total 156
+-rw-rw-r--. 1 ansible ansible   155 Jan  5 10:08 ansible.cfg
+-rw-rw-r--. 1 ansible ansible    65 Jan  5 11:35 jolly
+-rw-r--r--. 1 root    root        0 Jan  5 11:53 sample.txt
+drwxrwxr-x. 2 ansible ansible    72 Jan  5 11:55 playbooks
+-rw-rw-r--. 1 ansible ansible   163 Jan  6 04:51 file.yml
+-rw-rw-r--. 1 ansible ansible    11 Jan  6 05:15 copyfile.yml
+-rw-rw-r--. 1 ansible ansible   183 Jan  6 05:31 bkup-sudo.yml
+-rw-rw-r--. 1 ansible ansible   196 Jan  6 05:33 fetch.yml
+-rw-rw-r--. 1 ansible ansible   231 Jan  6 05:49 fetch_with_node.yml
+-rw-rw-r--. 1 ansible ansible 91407 Jan  6 05:53 ansiblerun.log
+[ansible@ansiblehost dev]$ cat fetch_with_node.yml
+---
+- name: Fetch remote sudoer file to local
+  hosts: all
+  tasks:
+   - name: Fetch sudoers file from remote node
+     fetch:
+      src: /var/tmp/sudoers.bk
+      dest: /var/tmp/sudoers.bk-{{ inventory_hostname }}
+      flat: yes
+[ansible@ansiblehost dev]$ vi content.yml
+[ansible@ansiblehost dev]$  ansible-playbook content.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: content.yml **************************************************************************************************************************************************
+1 plays in content.yml
+
+PLAY [Copy content to a config file] ***********************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/content.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Copying the file content] ****************************************************************************************************************************************
+task path: /home/ansible/dev/content.yml:5
+changed: [ansiblenode2] => {"changed": true, "checksum": "8b3249a635fade661a5e9a22cff3c1753de47665", "dest": "/var/tmp/sample-content.file", "gid": 0, "group": "root", "md5sum": "b4ed349f78183083dcaf708313c8c99b", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:user_home_t:s0", "size": 14, "src": "/home/ansible/.ansible/tmp/ansible-tmp-1546754851.06-254769736324990/source", "state": "file", "uid": 0}
+changed: [ansiblenode1] => {"changed": true, "checksum": "8b3249a635fade661a5e9a22cff3c1753de47665", "dest": "/var/tmp/sample-content.file", "gid": 0, "group": "root", "md5sum": "b4ed349f78183083dcaf708313c8c99b", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:user_home_t:s0", "size": 14, "src": "/home/ansible/.ansible/tmp/ansible-tmp-1546754851.1-137902839853155/source", "state": "file", "uid": 0}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=2    changed=1    unreachable=0    failed=0
+ansiblenode2               : ok=2    changed=1    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ vi create_file_copy_content.yml
+[ansible@ansiblehost dev]$ ansible-playbook create_file_copy_content.yml --syntax
+
+playbook: create_file_copy_content.yml
+[ansible@ansiblehost dev]$ ansible-playbook create_file_copy_content.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: create_file_copy_content.yml *********************************************************************************************************************************
+1 plays in create_file_copy_content.yml
+
+PLAY [Create dir and copy content to a file] ***************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/create_file_copy_content.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Create dir] ******************************************************************************************************************************************************
+task path: /home/ansible/dev/create_file_copy_content.yml:5
+fatal: [ansiblenode2]: FAILED! => {"changed": false, "msg": "value of state must be one of: file, directory, link, hard, touch, absent, got: directoy"}
+fatal: [ansiblenode1]: FAILED! => {"changed": false, "msg": "value of state must be one of: file, directory, link, hard, touch, absent, got: directoy"}
+        to retry, use: --limit @/home/ansible/dev/create_file_copy_content.retry
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=1    changed=0    unreachable=0    failed=1
+ansiblenode2               : ok=1    changed=0    unreachable=0    failed=1
+
+[ansible@ansiblehost dev]$ vi create_file_copy_content.yml
+[ansible@ansiblehost dev]$ ansible-playbook create_file_copy_content.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: create_file_copy_content.yml *********************************************************************************************************************************
+1 plays in create_file_copy_content.yml
+
+PLAY [Create dir and copy content to a file] ***************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/create_file_copy_content.yml:2
+ok: [ansiblenode1]
+ok: [ansiblenode2]
+META: ran handlers
+
+TASK [Create dir] ******************************************************************************************************************************************************
+task path: /home/ansible/dev/create_file_copy_content.yml:5
+changed: [ansiblenode1] => {"changed": true, "gid": 0, "group": "root", "mode": "0755", "owner": "root", "path": "/var/tmp/sample_dir", "secontext": "unconfined_u:object_r:user_tmp_t:s0", "size": 6, "state": "directory", "uid": 0}
+changed: [ansiblenode2] => {"changed": true, "gid": 0, "group": "root", "mode": "0755", "owner": "root", "path": "/var/tmp/sample_dir", "secontext": "unconfined_u:object_r:user_tmp_t:s0", "size": 6, "state": "directory", "uid": 0}
+
+TASK [Create file] *****************************************************************************************************************************************************
+task path: /home/ansible/dev/create_file_copy_content.yml:9
+changed: [ansiblenode1] => {"changed": true, "checksum": "6542501811fff6686bdc2b250d798750d1e3e29d", "dest": "/var/tmp/sample_dir/samplefile.txt", "gid": 0, "group": "root", "md5sum": "78247853f63423d2e4edda1a81ed2d13", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:user_home_t:s0", "size": 24, "src": "/home/ansible/.ansible/tmp/ansible-tmp-1546755160.99-257213896677122/source", "state": "file", "uid": 0}
+changed: [ansiblenode2] => {"changed": true, "checksum": "6542501811fff6686bdc2b250d798750d1e3e29d", "dest": "/var/tmp/sample_dir/samplefile.txt", "gid": 0, "group": "root", "md5sum": "78247853f63423d2e4edda1a81ed2d13", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:user_home_t:s0", "size": 24, "src": "/home/ansible/.ansible/tmp/ansible-tmp-1546755160.95-4514263540234/source", "state": "file", "uid": 0}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=3    changed=2    unreachable=0    failed=0
+ansiblenode2               : ok=3    changed=2    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ cat create_file_copy_content.
+cat: create_file_copy_content.: No such file or directory
+[ansible@ansiblehost dev]$ cat create_file_copy_content.yml
+---
+- name: Create dir and copy content to a file
+  hosts: all
+  tasks:
+   - name: Create dir
+     file:
+      path: /var/tmp/sample_dir
+      state: directory
+   - name: Create file
+     copy:
+      content: "Sample content to a file"
+      dest: /var/tmp/sample_dir/samplefile.txt
+...
+[ansible@ansiblehost dev]$ ansible all -m command -a "ls -l /var/tmp/" -vv
+ansible 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+META: ran handlers
+ansiblenode1 | CHANGED | rc=0 >>
+total 12
+-rw-r--r--. 1 root root   14 Jan  6 06:07 sample-content.file
+drwxr-xr-x. 2 root root   28 Jan  6 06:12 sample_dir
+-rw-------. 1 root root    0 Jan  5 11:49 sample.txt
+-rw-r--r--. 1 root root 4366 Jan  5 07:05 sudoers.bk
+drwx------. 3 root root   17 Jan  5 06:38 systemd-private-123cebaa712c4fd5996d2080ffff210e-chronyd.service-9v3EcZ
+drwx------. 2 root root   46 Dec 10 19:13 yum-root-46RQdX
+
+ansiblenode2 | CHANGED | rc=0 >>
+total 12
+-rw-r--r--. 1 root root   14 Jan  6 06:07 sample-content.file
+drwxr-xr-x. 2 root root   28 Jan  6 06:12 sample_dir
+-rw-------. 1 root root    0 Jan  5 11:49 sample.txt
+-rw-r--r--. 1 root root 4366 Jan  5 07:05 sudoers.bk
+drwx------. 3 root root   17 Jan  5 06:38 systemd-private-8516b6c68c2f4e0f8050ea495896f7a9-chronyd.service-sP2tks
+drwx------. 2 root root   46 Dec 10 19:13 yum-root-46RQdX
+
+META: ran handlers
+META: ran handlers
+[ansible@ansiblehost dev]$ ansible all -m command -a "ls -l /var/tmp/sample_dir" -vv
+ansible 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+META: ran handlers
+ansiblenode1 | CHANGED | rc=0 >>
+total 4
+-rw-r--r--. 1 root root 24 Jan  6 06:12 samplefile.txt
+
+ansiblenode2 | CHANGED | rc=0 >>
+total 4
+-rw-r--r--. 1 root root 24 Jan  6 06:12 samplefile.txt
+
+META: ran handlers
+META: ran handlers
+[ansible@ansiblehost dev]$ cat create_file_copy_content.
+cat: create_file_copy_content.: No such file or directory
+[ansible@ansiblehost dev]$ cat create_file_copy_content.yml
+---
+- name: Create dir and copy content to a file
+  hosts: all
+  tasks:
+   - name: Create dir
+     file:
+      path: /var/tmp/sample_dir
+      state: directory
+   - name: Create file
+     copy:
+      content: "Sample content to a file"
+      dest: /var/tmp/sample_dir/samplefile.txt
+...
+[ansible@ansiblehost dev]$ cat create_file_copy_content.yml
+---
+- name: Create dir and copy content to a file
+  hosts: all
+  tasks:
+   - name: Create dir
+     file:
+      path: /var/tmp/sample_dir
+      state: directory
+   - name: Create file
+     copy:
+      content: "Sample content to a file"
+      dest: /var/tmp/sample_dir/samplefile.txt
+...
+[ansible@ansiblehost dev]$ ls
+ansible.cfg     bkup-sudo.yml  copyfile.yml                    create_file_copy_content.yml  fetch.yml  jolly      sample.txt
+ansiblerun.log  content.yml    create_file_copy_content.retry  fetch_with_node.yml           file.yml   playbooks
+[ansible@ansiblehost dev]$ ansible all -m shell -a "ls -l /var/tmp/ ; ls -l /var/tmp/sample_dir" -vv
+ansible 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+META: ran handlers
+ansiblenode2 | CHANGED | rc=0 >>
+total 12
+-rw-r--r--. 1 root root   14 Jan  6 06:07 sample-content.file
+drwxr-xr-x. 2 root root   28 Jan  6 06:12 sample_dir
+-rw-------. 1 root root    0 Jan  5 11:49 sample.txt
+-rw-r--r--. 1 root root 4366 Jan  5 07:05 sudoers.bk
+drwx------. 3 root root   17 Jan  5 06:38 systemd-private-8516b6c68c2f4e0f8050ea495896f7a9-chronyd.service-sP2tks
+drwx------. 2 root root   46 Dec 10 19:13 yum-root-46RQdX
+total 4
+-rw-r--r--. 1 root root 24 Jan  6 06:12 samplefile.txt
+
+ansiblenode1 | CHANGED | rc=0 >>
+total 12
+-rw-r--r--. 1 root root   14 Jan  6 06:07 sample-content.file
+drwxr-xr-x. 2 root root   28 Jan  6 06:12 sample_dir
+-rw-------. 1 root root    0 Jan  5 11:49 sample.txt
+-rw-r--r--. 1 root root 4366 Jan  5 07:05 sudoers.bk
+drwx------. 3 root root   17 Jan  5 06:38 systemd-private-123cebaa712c4fd5996d2080ffff210e-chronyd.service-9v3EcZ
+drwx------. 2 root root   46 Dec 10 19:13 yum-root-46RQdX
+total 4
+-rw-r--r--. 1 root root 24 Jan  6 06:12 samplefile.txt
+
+META: ran handlers
+META: ran handlers
+[ansible@ansiblehost dev]$ ansible all -m shell -a "ls -l /var/tmp/ ; echo "command 2" ; ls -l /var/tmp/sample_dir" -vv
+Usage: ansible <host-pattern> [options]
+
+Define and run a single task 'playbook' against a set of hosts
+
+Options:
+  -a MODULE_ARGS, --args=MODULE_ARGS
+                        module arguments
+  --ask-vault-pass      ask for vault password
+  -B SECONDS, --background=SECONDS
+                        run asynchronously, failing after X seconds
+                        (default=N/A)
+  -C, --check           don't make any changes; instead, try to predict some
+                        of the changes that may occur
+  -D, --diff            when changing (small) files and templates, show the
+                        differences in those files; works great with --check
+  -e EXTRA_VARS, --extra-vars=EXTRA_VARS
+                        set additional variables as key=value or YAML/JSON, if
+                        filename prepend with @
+  -f FORKS, --forks=FORKS
+                        specify number of parallel processes to use
+                        (default=5)
+  -h, --help            show this help message and exit
+  -i INVENTORY, --inventory=INVENTORY, --inventory-file=INVENTORY
+                        specify inventory host path or comma separated host
+                        list. --inventory-file is deprecated
+  -l SUBSET, --limit=SUBSET
+                        further limit selected hosts to an additional pattern
+  --list-hosts          outputs a list of matching hosts; does not execute
+                        anything else
+  -m MODULE_NAME, --module-name=MODULE_NAME
+                        module name to execute (default=command)
+  -M MODULE_PATH, --module-path=MODULE_PATH
+                        prepend colon-separated path(s) to module library
+                        (default=[u'/home/ansible/.ansible/plugins/modules',
+                        u'/usr/share/ansible/plugins/modules'])
+  -o, --one-line        condense output
+  --playbook-dir=BASEDIR
+                        Since this tool does not use playbooks, use this as a
+                        subsitute playbook directory.This sets the relative
+                        path for many features including roles/ group_vars/
+                        etc.
+  -P POLL_INTERVAL, --poll=POLL_INTERVAL
+                        set the poll interval if using -B (default=15)
+  --syntax-check        perform a syntax check on the playbook, but do not
+                        execute it
+  -t TREE, --tree=TREE  log output to this directory
+  --vault-id=VAULT_IDS  the vault identity to use
+  --vault-password-file=VAULT_PASSWORD_FILES
+                        vault password file
+  -v, --verbose         verbose mode (-vvv for more, -vvvv to enable
+                        connection debugging)
+  --version             show program's version number and exit
+
+  Connection Options:
+    control as whom and how to connect to hosts
+
+    -k, --ask-pass      ask for connection password
+    --private-key=PRIVATE_KEY_FILE, --key-file=PRIVATE_KEY_FILE
+                        use this file to authenticate the connection
+    -u REMOTE_USER, --user=REMOTE_USER
+                        connect as this user (default=None)
+    -c CONNECTION, --connection=CONNECTION
+                        connection type to use (default=smart)
+    -T TIMEOUT, --timeout=TIMEOUT
+                        override the connection timeout in seconds
+                        (default=10)
+    --ssh-common-args=SSH_COMMON_ARGS
+                        specify common arguments to pass to sftp/scp/ssh (e.g.
+                        ProxyCommand)
+    --sftp-extra-args=SFTP_EXTRA_ARGS
+                        specify extra arguments to pass to sftp only (e.g. -f,
+                        -l)
+    --scp-extra-args=SCP_EXTRA_ARGS
+                        specify extra arguments to pass to scp only (e.g. -l)
+    --ssh-extra-args=SSH_EXTRA_ARGS
+                        specify extra arguments to pass to ssh only (e.g. -R)
+
+  Privilege Escalation Options:
+    control how and which user you become as on target hosts
+
+    -s, --sudo          run operations with sudo (nopasswd) (deprecated, use
+                        become)
+    -U SUDO_USER, --sudo-user=SUDO_USER
+                        desired sudo user (default=root) (deprecated, use
+                        become)
+    -S, --su            run operations with su (deprecated, use become)
+    -R SU_USER, --su-user=SU_USER
+                        run operations with su as this user (default=None)
+                        (deprecated, use become)
+    -b, --become        run operations with become (does not imply password
+                        prompting)
+    --become-method=BECOME_METHOD
+                        privilege escalation method to use (default=sudo),
+                        valid choices: [ sudo | su | pbrun | pfexec | doas |
+                        dzdo | ksu | runas | pmrun | enable | machinectl ]
+    --become-user=BECOME_USER
+                        run operations as this user (default=root)
+    --ask-sudo-pass     ask for sudo password (deprecated, use become)
+    --ask-su-pass       ask for su password (deprecated, use become)
+    -K, --ask-become-pass
+                        ask for privilege escalation password
+
+Some modules do not make sense in Ad-Hoc (include, meta, etc)
+ERROR! Extraneous options or arguments
+[ansible@ansiblehost dev]$ ansible all -m shell -a "ls -l /var/tmp/ ; echo 'command 2' ; ls -l /var/tmp/sample_dir" -vv
+ansible 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+META: ran handlers
+ansiblenode2 | CHANGED | rc=0 >>
+total 12
+-rw-r--r--. 1 root root   14 Jan  6 06:07 sample-content.file
+drwxr-xr-x. 2 root root   28 Jan  6 06:12 sample_dir
+-rw-------. 1 root root    0 Jan  5 11:49 sample.txt
+-rw-r--r--. 1 root root 4366 Jan  5 07:05 sudoers.bk
+drwx------. 3 root root   17 Jan  5 06:38 systemd-private-8516b6c68c2f4e0f8050ea495896f7a9-chronyd.service-sP2tks
+drwx------. 2 root root   46 Dec 10 19:13 yum-root-46RQdX
+command 2
+total 4
+-rw-r--r--. 1 root root 24 Jan  6 06:12 samplefile.txt
+
+ansiblenode1 | CHANGED | rc=0 >>
+total 12
+-rw-r--r--. 1 root root   14 Jan  6 06:07 sample-content.file
+drwxr-xr-x. 2 root root   28 Jan  6 06:12 sample_dir
+-rw-------. 1 root root    0 Jan  5 11:49 sample.txt
+-rw-r--r--. 1 root root 4366 Jan  5 07:05 sudoers.bk
+drwx------. 3 root root   17 Jan  5 06:38 systemd-private-123cebaa712c4fd5996d2080ffff210e-chronyd.service-9v3EcZ
+drwx------. 2 root root   46 Dec 10 19:13 yum-root-46RQdX
+command 2
+total 4
+-rw-r--r--. 1 root root 24 Jan  6 06:12 samplefile.txt
+
+META: ran handlers
+META: ran handlers
+[ansible@ansiblehost dev]$ ls
+ansible.cfg     bkup-sudo.yml  copyfile.yml                    create_file_copy_content.yml  fetch.yml  jolly      sample.txt
+ansiblerun.log  content.yml    create_file_copy_content.retry  fetch_with_node.yml           file.yml   playbooks
+[ansible@ansiblehost dev]$ ansible all -m shell -a "ls -l /var/tmp/ ; echo 'command 2' ; ls -l /var/tmp/sample_dir ; cat /var/tmp/sample_dir/samplefile*" -vv
+ansible 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+META: ran handlers
+ansiblenode2 | CHANGED | rc=0 >>
+total 12
+-rw-r--r--. 1 root root   14 Jan  6 06:07 sample-content.file
+drwxr-xr-x. 2 root root   28 Jan  6 06:12 sample_dir
+-rw-------. 1 root root    0 Jan  5 11:49 sample.txt
+-rw-r--r--. 1 root root 4366 Jan  5 07:05 sudoers.bk
+drwx------. 3 root root   17 Jan  5 06:38 systemd-private-8516b6c68c2f4e0f8050ea495896f7a9-chronyd.service-sP2tks
+drwx------. 2 root root   46 Dec 10 19:13 yum-root-46RQdX
+command 2
+total 4
+-rw-r--r--. 1 root root 24 Jan  6 06:12 samplefile.txt
+Sample content to a file
+
+ansiblenode1 | CHANGED | rc=0 >>
+total 12
+-rw-r--r--. 1 root root   14 Jan  6 06:07 sample-content.file
+drwxr-xr-x. 2 root root   28 Jan  6 06:12 sample_dir
+-rw-------. 1 root root    0 Jan  5 11:49 sample.txt
+-rw-r--r--. 1 root root 4366 Jan  5 07:05 sudoers.bk
+drwx------. 3 root root   17 Jan  5 06:38 systemd-private-123cebaa712c4fd5996d2080ffff210e-chronyd.service-9v3EcZ
+drwx------. 2 root root   46 Dec 10 19:13 yum-root-46RQdX
+command 2
+total 4
+-rw-r--r--. 1 root root 24 Jan  6 06:12 samplefile.txt
+Sample content to a file
+
+META: ran handlers
+META: ran handlers
+[ansible@ansiblehost dev]$ ansible all -m shell -a "ls -l /var/tmp/ ; echo 'command 2' ; ls -l /var/tmp/sample_dir ; cat /var/tmp/sample_dir/samplefile*" -vv^C
+[ansible@ansiblehost dev]$ pwd
+/home/ansible/dev
+[ansible@ansiblehost dev]$ ls
+ansible.cfg     bkup-sudo.yml  copyfile.yml                    create_file_copy_content.yml  fetch.yml  jolly      sample.txt
+ansiblerun.log  content.yml    create_file_copy_content.retry  fetch_with_node.yml           file.yml   playbooks
+[ansible@ansiblehost dev]$ ls -ltr
+total 152
+-rw-rw-r--. 1 ansible ansible    155 Jan  5 10:08 ansible.cfg
+-rw-rw-r--. 1 ansible ansible     65 Jan  5 11:35 jolly
+-rw-r--r--. 1 root    root         0 Jan  5 11:53 sample.txt
+drwxrwxr-x. 2 ansible ansible     72 Jan  5 11:55 playbooks
+-rw-rw-r--. 1 ansible ansible    163 Jan  6 04:51 file.yml
+-rw-rw-r--. 1 ansible ansible     11 Jan  6 05:15 copyfile.yml
+-rw-rw-r--. 1 ansible ansible    183 Jan  6 05:31 bkup-sudo.yml
+-rw-rw-r--. 1 ansible ansible    196 Jan  6 05:33 fetch.yml
+-rw-rw-r--. 1 ansible ansible    231 Jan  6 05:49 fetch_with_node.yml
+-rw-rw-r--. 1 ansible ansible    188 Jan  6 06:06 content.yml
+-rw-rw-r--. 1 ansible ansible     26 Jan  6 06:12 create_file_copy_content.retry
+-rw-rw-r--. 1 ansible ansible    288 Jan  6 06:12 create_file_copy_content.yml
+-rw-rw-r--. 1 ansible ansible 112803 Jan  6 06:28 ansiblerun.log
+[ansible@ansiblehost dev]$ vi file.yml
+[ansible@ansiblehost dev]$ vi copyfile.yml
+[ansible@ansiblehost dev]$ cat playbooks/
+copy.retry  copy.yml    ftp.yml     httpd.yml
+[ansible@ansiblehost dev]$ cat playbooks/copy.yml
+---
+- name: Create a file into client nodes
+  hosts: localhost
+  tasks:
+   - name: Create file
+     file:
+      path: /home/ansible/dev/sample.txt
+      state: touch
+- name: Copy a file into client nodes
+  hosts: all
+  tasks:
+   - name: Copying files
+     copy:
+      remote_src: no
+      src: /home/ansible/dev/sample.txt
+      dest: /var/tmp
+      mode: 0600
+
+[ansible@ansiblehost dev]$ cat file.yml
+---
+- name: Create a file into client nodes
+  hosts: localhost
+  tasks:
+   - name: Create file
+     file:
+      path: /home/ansible/sample2.txt
+      state: touch
+[ansible@ansiblehost dev]$ ls
+ansible.cfg     bkup-sudo.yml  copyfile.yml                    create_file_copy_content.yml  fetch.yml  jolly      sample.txt
+ansiblerun.log  content.yml    create_file_copy_content.retry  fetch_with_node.yml           file.yml   playbooks
+[ansible@ansiblehost dev]$ rm create_file_copy_content.retry
+[ansible@ansiblehost dev]$ ls
+ansible.cfg     bkup-sudo.yml  copyfile.yml                  fetch_with_node.yml  file.yml  playbooks
+ansiblerun.log  content.yml    create_file_copy_content.yml  fetch.yml            jolly     sample.txt
+[ansible@ansiblehost dev]$ vi lineinfile.yml
+[ansible@ansiblehost dev]$ ansible-playbook lineinfile.yml
+ERROR! 'regexp' is not a valid attribute for a Task
+
+The error appears to have been in '/home/ansible/dev/lineinfile.yml': line 5, column 6, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+  tasks:
+   - name: Change line
+     ^ here
+
+This error can be suppressed as a warning using the "invalid_task_attribute_failed" configuration
+[ansible@ansiblehost dev]$ vi lineinfile.yml
+[ansible@ansiblehost dev]$ ansible-playbook lineinfile.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: lineinfile.yml ***********************************************************************************************************************************************
+1 plays in lineinfile.yml
+
+PLAY [Line in file sample] *********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/lineinfile.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Change line] *****************************************************************************************************************************************************
+task path: /home/ansible/dev/lineinfile.yml:5
+changed: [ansiblenode2] => {"backup": "", "changed": true, "msg": "line replaced"}
+changed: [ansiblenode1] => {"backup": "", "changed": true, "msg": "line replaced"}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=2    changed=1    unreachable=0    failed=0
+ansiblenode2               : ok=2    changed=1    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ ansible all -m shell -a "ls -l /var/tmp/ ; echo 'command 2' ; ls -l /var/tmp/sample_dir ; cat /var/tmp/sample_dir/samplefile*" -vv
+ansible 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+META: ran handlers
+ansiblenode2 | CHANGED | rc=0 >>
+total 12
+-rw-r--r--. 1 root root   14 Jan  6 06:07 sample-content.file
+drwxr-xr-x. 2 root root   28 Jan  6 07:01 sample_dir
+-rw-------. 1 root root    0 Jan  5 11:49 sample.txt
+-rw-r--r--. 1 root root 4366 Jan  5 07:05 sudoers.bk
+drwx------. 3 root root   17 Jan  5 06:38 systemd-private-8516b6c68c2f4e0f8050ea495896f7a9-chronyd.service-sP2tks
+drwx------. 2 root root   46 Dec 10 19:13 yum-root-46RQdX
+command 2
+total 4
+-rw-r--r--. 1 root root 20 Jan  6 07:01 samplefile.txt
+**Sample modified**
+
+ansiblenode1 | CHANGED | rc=0 >>
+total 12
+-rw-r--r--. 1 root root   14 Jan  6 06:07 sample-content.file
+drwxr-xr-x. 2 root root   28 Jan  6 07:01 sample_dir
+-rw-------. 1 root root    0 Jan  5 11:49 sample.txt
+-rw-r--r--. 1 root root 4366 Jan  5 07:05 sudoers.bk
+drwx------. 3 root root   17 Jan  5 06:38 systemd-private-123cebaa712c4fd5996d2080ffff210e-chronyd.service-9v3EcZ
+drwx------. 2 root root   46 Dec 10 19:13 yum-root-46RQdX
+command 2
+total 4
+-rw-r--r--. 1 root root 20 Jan  6 07:01 samplefile.txt
+**Sample modified**
+
+META: ran handlers
+META: ran handlers
+[ansible@ansiblehost dev]$ cat create_file_copy_content.yml
+---
+- name: Create dir and copy content to a file
+  hosts: all
+  tasks:
+   - name: Create dir
+     file:
+      path: /var/tmp/sample_dir
+      state: directory
+   - name: Create file
+     copy:
+      content: "Sample content to a file"
+      dest: /var/tmp/sample_dir/samplefile.txt
+...
+[ansible@ansiblehost dev]$ ls
+ansible.cfg     bkup-sudo.yml  copyfile.yml                  fetch_with_node.yml  file.yml  lineinfile.yml  sample.txt
+ansiblerun.log  content.yml    create_file_copy_content.yml  fetch.yml            jolly     playbooks
+[ansible@ansiblehost dev]$ cat bkup-sudo.yml
+---
+- name: Backup sudo file in remote node
+  hosts: all
+  tasks:
+   - name: Backup sudo file
+     copy:
+      src: /etc/sudoers
+      dest: /var/tmp/sudoers.bk
+      remote_src: yes
+[ansible@ansiblehost dev]$ cat fetch.yml
+---
+- name: Fetch remote sudoer file to local
+  hosts: all
+  tasks:
+   - name: Fetch sudoers file from remote node
+     fetch:
+      src: /var/tmp/sudoers.bk
+      dest: /var/tmp/
+      flat: yes
+[ansible@ansiblehost dev]$ cat create_file_copy_content.yml
+---
+- name: Create dir and copy content to a file
+  hosts: all
+  tasks:
+   - name: Create dir
+     file:
+      path: /var/tmp/sample_dir
+      state: directory
+   - name: Create file
+     copy:
+      content: "Sample content to a file"
+      dest: /var/tmp/sample_dir/samplefile.txt
+...
+[ansible@ansiblehost dev]$
+login as: ansible
+ansible@35.231.75.161's password:
+Last login: Sun Jan  6 05:41:25 2019 from 210.18.181.195
+[ansible@ansiblehost ~]$ cd dev
+[ansible@ansiblehost dev]$ vi blockinfile.yml
+[ansible@ansiblehost dev]$ ansible-playbook blockinfile.yml --syntax
+
+playbook: blockinfile.yml
+[ansible@ansiblehost dev]$ ansible-playbook blockinfile.yml -vvv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+Parsed /home/ansible/dev/jolly inventory source with ini plugin
+
+PLAYBOOK: blockinfile.yml **********************************************************************************************************************************************
+1 plays in blockinfile.yml
+
+PLAY [blobkinfile sample] **********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/blockinfile.yml:2
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd ansiblenode1 '/bin/sh -c '"'"'echo ~ && sleep 0'"'"''
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 ansiblenode2 '/bin/sh -c '"'"'echo ~ && sleep 0'"'"''
+<ansiblenode2> (0, '/home/ansible\n', '')
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 ansiblenode2 '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-65248045798032 `" && echo ansible-tmp-1546759472.84-65248045798032="` echo /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-65248045798032 `" ) && sleep 0'"'"''
+<ansiblenode1> (0, '/home/ansible\n', '')
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd ansiblenode1 '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-209840409050423 `" && echo ansible-tmp-1546759472.84-209840409050423="` echo /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-209840409050423 `" ) && sleep 0'"'"''
+<ansiblenode2> (0, 'ansible-tmp-1546759472.84-65248045798032=/home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-65248045798032\n', '')
+<ansiblenode1> (0, 'ansible-tmp-1546759472.84-209840409050423=/home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-209840409050423\n', '')
+Using module file /usr/lib/python2.7/site-packages/ansible/modules/system/setup.py
+<ansiblenode2> PUT /home/ansible/.ansible/tmp/ansible-local-31200c15bvx/tmp4gmttG TO /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-65248045798032/AnsiballZ_setup.py
+<ansiblenode2> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 '[ansiblenode2]'
+Using module file /usr/lib/python2.7/site-packages/ansible/modules/system/setup.py
+<ansiblenode1> PUT /home/ansible/.ansible/tmp/ansible-local-31200c15bvx/tmpEYrPPO TO /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-209840409050423/AnsiballZ_setup.py
+<ansiblenode1> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd '[ansiblenode1]'
+<ansiblenode2> (0, 'sftp> put /home/ansible/.ansible/tmp/ansible-local-31200c15bvx/tmp4gmttG /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-65248045798032/AnsiballZ_setup.py\n', '')
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 ansiblenode2 '/bin/sh -c '"'"'chmod u+x /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-65248045798032/ /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-65248045798032/AnsiballZ_setup.py && sleep 0'"'"''
+<ansiblenode1> (0, 'sftp> put /home/ansible/.ansible/tmp/ansible-local-31200c15bvx/tmpEYrPPO /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-209840409050423/AnsiballZ_setup.py\n', '')
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd ansiblenode1 '/bin/sh -c '"'"'chmod u+x /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-209840409050423/ /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-209840409050423/AnsiballZ_setup.py && sleep 0'"'"''
+<ansiblenode2> (0, '', '')
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 -tt ansiblenode2 '/bin/sh -c '"'"'sudo -H -S -n -u root /bin/sh -c '"'"'"'"'"'"'"'"'echo BECOME-SUCCESS-plqtrpjhyyljclyqtlwcahbsfukvcaau; /usr/bin/python /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-65248045798032/AnsiballZ_setup.py'"'"'"'"'"'"'"'"' && sleep 0'"'"''
+<ansiblenode1> (0, '', '')
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd -tt ansiblenode1 '/bin/sh -c '"'"'sudo -H -S -n -u root /bin/sh -c '"'"'"'"'"'"'"'"'echo BECOME-SUCCESS-yrwjhapxerbowlebeviiedbtiuyobiyd; /usr/bin/python /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-209840409050423/AnsiballZ_setup.py'"'"'"'"'"'"'"'"' && sleep 0'"'"''
+Escalation succeeded
+Escalation succeeded
+<ansiblenode2> (0, '\r\n{"invocation": {"module_args": {"filter": "*", "gather_subset": ["all"], "fact_path": "/etc/ansible/facts.d", "gather_timeout": 10}}, "ansible_facts": {"ansible_product_serial": "GoogleCloud-E14D4CB5ED07FADF26727A818E25955D", "ansible_form_factor": "Other", "ansible_user_gecos": "root", "ansible_distribution_file_parsed": true, "ansible_fips": false, "ansible_service_mgr": "systemd", "ansible_user_id": "root", "ansible_selinux_python_present": true, "ansible_userspace_bits": "64", "ansible_ssh_host_key_rsa_public": "AAAAB3NzaC1yc2EAAAADAQABAAABAQCgYEAe8jWql6n28LZM20xJEeuFAasStwVA/DgXXX7b11Quhf+NCHlHHmzWrnFFysV2c5znFaDWEkxZep6AsJt/b2a0OwHTUV/E1oI2aJ2QibPatcL/rd2MPQUACgq1eHfT26sZaWvkgUCZw/0YONM1B0Xfc3zsLCPxIEtMkQI68B0At9LKk9vb3AXJSfSQLF8sbAeiAQkdICtCgDS+xSeE5e71jZ/JpnhbZRZOf4pg36y1DLqnl74HPHLnPM5dRBEa9V2lAT9CWgmH/mNnlRmuj3m2UK8Rqa98hd8w3Jfpv9Ds/Szl/stbLrYlKOYlk7Q9wCQrl+jx1jpdIbxNGKNT", "gather_subset": ["all"], "ansible_ssh_host_key_ecdsa_public": "AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNvwIltrEHnebWZlkzCBAfP+xGuUTc3UvztK8m6r3YC6YOhk9S+O6VwiUxhnn5P1JZPSWVKN7N6CxmyMm8GQDxk=", "ansible_local": {}, "ansible_distribution_version": "7.6.1810", "ansible_domain": "cnl.com", "ansible_distribution_file_path": "/etc/redhat-release", "ansible_user_shell": "/bin/bash", "ansible_virtualization_type": "kvm", "ansible_real_user_id": 0, "ansible_processor_cores": 1, "ansible_virtualization_role": "guest", "ansible_distribution_file_variety": "RedHat", "ansible_dns": {"nameservers": ["169.254.169.254"], "search": ["us-east1-b.c.tensile-tenure-225805.internal", "c.tensile-tenure-225805.internal", "google.internal", "cnl.com"]}, "ansible_effective_group_id": 0, "ansible_is_chroot": false, "ansible_bios_version": "Google", "ansible_processor": ["0", "GenuineIntel", "Intel(R) Xeon(R) CPU @ 2.20GHz"], "ansible_date_time": {"weekday_number": "0", "iso8601_basic_short": "20190106T072433", "tz": "UTC", "weeknumber": "00", "hour": "07", "year": "2019", "minute": "24", "tz_offset": "+0000", "month": "01", "epoch": "1546759473", "iso8601_micro": "2019-01-06T07:24:33.979665Z", "weekday": "Sunday", "time": "07:24:33", "date": "2019-01-06", "iso8601": "2019-01-06T07:24:33Z", "day": "06", "iso8601_basic": "20190106T072433979567", "second": "33"}, "ansible_lo": {"features": {"tx_checksum_ipv4": "off [fixed]", "generic_receive_offload": "on", "tx_checksum_ipv6": "off [fixed]", "tx_scatter_gather_fraglist": "on [fixed]", "rx_all": "off [fixed]", "highdma": "on [fixed]", "rx_fcs": "off [fixed]", "tx_lockless": "on [fixed]", "tx_tcp_ecn_segmentation": "on", "rx_udp_tunnel_port_offload": "off [fixed]", "tx_tcp6_segmentation": "on", "tx_gso_robust": "off [fixed]", "tx_ipip_segmentation": "off [fixed]", "tx_tcp_mangleid_segmentation": "on", "tx_checksumming": "on", "vlan_challenged": "on [fixed]", "loopback": "on [fixed]", "fcoe_mtu": "off [fixed]", "scatter_gather": "on", "tx_checksum_sctp": "on [fixed]", "tx_vlan_stag_hw_insert": "off [fixed]", "rx_vlan_stag_hw_parse": "off [fixed]", "tx_gso_partial": "off [fixed]", "rx_gro_hw": "off [fixed]", "rx_vlan_stag_filter": "off [fixed]", "large_receive_offload": "off [fixed]", "tx_scatter_gather": "on [fixed]", "rx_checksumming": "on [fixed]", "tx_tcp_segmentation": "on", "netns_local": "on [fixed]", "busy_poll": "off [fixed]", "generic_segmentation_offload": "on", "tx_udp_tnl_segmentation": "off [fixed]", "tcp_segmentation_offload": "on", "l2_fwd_offload": "off [fixed]", "rx_vlan_offload": "off [fixed]", "ntuple_filters": "off [fixed]", "tx_gre_csum_segmentation": "off [fixed]", "tx_nocache_copy": "off [fixed]", "tx_udp_tnl_csum_segmentation": "off [fixed]", "udp_fragmentation_offload": "on", "tx_sctp_segmentation": "on", "tx_sit_segmentation": "off [fixed]", "tx_checksum_fcoe_crc": "off [fixed]", "hw_tc_offload": "off [fixed]", "tx_checksum_ip_generic": "on [fixed]", "tx_fcoe_segmentation": "off [fixed]", "rx_vlan_filter": "off [fixed]", "tx_vlan_offload": "off [fixed]", "receive_hashing": "off [fixed]", "tx_gre_segmentation": "off [fixed]"}, "hw_timestamp_filters": [], "mtu": 65536, "device": "lo", "promisc": false, "timestamping": ["rx_software", "software"], "ipv4": {"broadcast": "host", "netmask": "255.0.0.0", "network": "127.0.0.0", "address": "127.0.0.1"}, "ipv6": [{"scope": "host", "prefix": "128", "address": "::1"}], "active": true, "type": "loopback"}, "ansible_memtotal_mb": 991, "ansible_architecture": "x86_64", "ansible_device_links": {"masters": {}, "labels": {"sda1": ["\\\\x2f"]}, "ids": {"sda": ["google-ansiblenode2", "scsi-0Google_PersistentDisk_ansiblenode2"], "sda1": ["google-ansiblenode2-part1", "scsi-0Google_PersistentDisk_ansiblenode2-part1"]}, "uuids": {"sda1": ["393f50c7-5f64-4eb7-92ec-3d0e7c4b5eb4"]}}, "ansible_default_ipv4": {"macaddress": "42:01:0a:8e:00:04", "network": "10.142.0.4", "mtu": 1460, "broadcast": "10.142.0.4", "alias": "eth0", "netmask": "255.255.255.255", "address": "10.142.0.4", "interface": "eth0", "type": "ether", "gateway": "10.142.0.1"}, "ansible_swapfree_mb": 0, "ansible_default_ipv6": {}, "ansible_distribution_release": "Core", "ansible_system_vendor": "Google", "ansible_os_family": "RedHat", "ansible_cmdline": {"BOOT_IMAGE": "/boot/vmlinuz-3.10.0-957.1.3.el7.x86_64", "ro": true, "root": "UUID=393f50c7-5f64-4eb7-92ec-3d0e7c4b5eb4", "crashkernel": "auto", "console": "ttyS0,38400n8"}, "ansible_effective_user_id": 0, "ansible_user_gid": 0, "ansible_selinux": {"status": "enabled", "policyvers": 31, "type": "targeted", "mode": "permissive", "config_mode": "enforcing"}, "ansible_product_version": "NA", "ansible_apparmor": {"status": "disabled"}, "ansible_userspace_architecture": "x86_64", "ansible_product_uuid": "E14D4CB5-ED07-FADF-2672-7A818E25955D", "ansible_fqdn": "ansnode2.cnl.com", "ansible_system": "Linux", "ansible_pkg_mgr": "yum", "ansible_memfree_mb": 262, "ansible_devices": {"sda": {"scheduler_mode": "deadline", "rotational": "1", "vendor": "Google", "sectors": "41943040", "links": {"masters": [], "labels": [], "ids": ["google-ansiblenode2", "scsi-0Google_PersistentDisk_ansiblenode2"], "uuids": []}, "sas_device_handle": null, "sas_address": null, "virtual": 1, "host": "", "sectorsize": "512", "removable": "0", "support_discard": "512", "model": "PersistentDisk", "partitions": {"sda1": {"sectorsize": 512, "uuid": "393f50c7-5f64-4eb7-92ec-3d0e7c4b5eb4", "links": {"masters": [], "labels": ["\\\\x2f"], "ids": ["google-ansiblenode2-part1", "scsi-0Google_PersistentDisk_ansiblenode2-part1"], "uuids": ["393f50c7-5f64-4eb7-92ec-3d0e7c4b5eb4"]}, "sectors": "41927602", "start": "2048", "holders": [], "size": "19.99 GB"}}, "holders": [], "size": "20.00 GB"}}, "ansible_user_uid": 0, "ansible_memory_mb": {"real": {"total": 991, "used": 729, "free": 262}, "swap": {"cached": 0, "total": 0, "free": 0, "used": 0}, "nocache": {"used": 298, "free": 693}}, "ansible_distribution": "CentOS", "ansible_user_dir": "/root", "ansible_env": {"USERNAME": "root", "LANG": "en_US.UTF-8", "TERM": "xterm", "SHELL": "/bin/bash", "SUDO_COMMAND": "/bin/sh -c echo BECOME-SUCCESS-plqtrpjhyyljclyqtlwcahbsfukvcaau; /usr/bin/python /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-65248045798032/AnsiballZ_setup.py", "SHLVL": "1", "XDG_SESSION_ID": "58", "SUDO_UID": "1001", "SUDO_GID": "1002", "PWD": "/home/ansible", "LOGNAME": "root", "USER": "root", "MAIL": "/var/mail/ansible", "PATH": "/sbin:/bin:/usr/sbin:/usr/bin", "SUDO_USER": "ansible", "LS_COLORS": "rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=01;36:*.xspf=01;36:", "HOME": "/root", "_": "/usr/bin/python"}, "ansible_distribution_major_version": "7", "module_setup": true, "ansible_processor_count": 1, "ansible_hostname": "ansnode2", "ansible_processor_vcpus": 1, "ansible_swaptotal_mb": 0, "ansible_lsb": {}, "ansible_real_group_id": 0, "ansible_bios_date": "01/01/2011", "ansible_all_ipv6_addresses": ["fe80::4001:aff:fe8e:4"], "ansible_interfaces": ["lo", "eth0"], "ansible_uptime_seconds": 89179, "ansible_machine_id": "3d6410107e6f0fbfa6777e64d75c238c", "ansible_kernel": "3.10.0-957.1.3.el7.x86_64", "ansible_iscsi_iqn": "", "ansible_system_capabilities_enforced": "True", "ansible_python": {"executable": "/usr/bin/python", "version": {"micro": 5, "major": 2, "releaselevel": "final", "serial": 0, "minor": 7}, "type": "CPython", "has_sslcontext": true, "version_info": [2, 7, 5, "final", 0]}, "ansible_processor_threads_per_core": 1, "ansible_ssh_host_key_ed25519_public": "AAAAC3NzaC1lZDI1NTE5AAAAIN+BdHqOQAblPcfKjZIU/Ecdn0zwFHxnurJCEFh1Eiw1", "ansible_mounts": [{"block_used": 440745, "uuid": "393f50c7-5f64-4eb7-92ec-3d0e7c4b5eb4", "size_total": 21456445440, "block_total": 5238390, "mount": "/", "block_available": 4797645, "size_available": 19651153920, "fstype": "xfs", "inode_total": 10481856, "options": "rw,seclabel,relatime,attr2,inode64,noquota", "device": "/dev/sda1", "inode_used": 55968, "block_size": 4096, "inode_available": 10425888}], "ansible_eth0": {"macaddress": "42:01:0a:8e:00:04", "features": {"tx_checksum_ipv4": "off [fixed]", "generic_receive_offload": "on", "tx_checksum_ipv6": "off [fixed]", "tx_scatter_gather_fraglist": "off [fixed]", "rx_all": "off [fixed]", "highdma": "on [fixed]", "rx_fcs": "off [fixed]", "tx_lockless": "off [fixed]", "tx_tcp_ecn_segmentation": "off [fixed]", "rx_udp_tunnel_port_offload": "off [fixed]", "tx_tcp6_segmentation": "on", "tx_gso_robust": "off [fixed]", "tx_ipip_segmentation": "off [fixed]", "tx_tcp_mangleid_segmentation": "off", "tx_checksumming": "on", "vlan_challenged": "off [fixed]", "loopback": "off [fixed]", "fcoe_mtu": "off [fixed]", "scatter_gather": "on", "tx_checksum_sctp": "off [fixed]", "tx_vlan_stag_hw_insert": "off [fixed]", "rx_vlan_stag_hw_parse": "off [fixed]", "tx_gso_partial": "off [fixed]", "rx_gro_hw": "off [fixed]", "rx_vlan_stag_filter": "off [fixed]", "large_receive_offload": "off [fixed]", "tx_scatter_gather": "on", "rx_checksumming": "on [fixed]", "tx_tcp_segmentation": "on", "netns_local": "off [fixed]", "busy_poll": "off [fixed]", "generic_segmentation_offload": "on", "tx_udp_tnl_segmentation": "off [fixed]", "tcp_segmentation_offload": "on", "l2_fwd_offload": "off [fixed]", "rx_vlan_offload": "off [fixed]", "ntuple_filters": "off [fixed]", "tx_gre_csum_segmentation": "off [fixed]", "tx_nocache_copy": "off", "tx_udp_tnl_csum_segmentation": "off [fixed]", "udp_fragmentation_offload": "off [fixed]", "tx_sctp_segmentation": "off [fixed]", "tx_sit_segmentation": "off [fixed]", "tx_checksum_fcoe_crc": "off [fixed]", "hw_tc_offload": "off [fixed]", "tx_checksum_ip_generic": "on", "tx_fcoe_segmentation": "off [fixed]", "rx_vlan_filter": "off [fixed]", "tx_vlan_offload": "off [fixed]", "receive_hashing": "off [fixed]", "tx_gre_segmentation": "off [fixed]"}, "pciid": "virtio1", "module": "virtio_net", "mtu": 1460, "device": "eth0", "promisc": false, "timestamping": ["rx_software", "software"], "ipv4": {"broadcast": "10.142.0.4", "netmask": "255.255.255.255", "network": "10.142.0.4", "address": "10.142.0.4"}, "ipv6": [{"scope": "link", "prefix": "64", "address": "fe80::4001:aff:fe8e:4"}], "active": true, "type": "ether", "hw_timestamp_filters": []}, "ansible_nodename": "ansnode2.cnl.com", "ansible_product_name": "Google Compute Engine", "ansible_machine": "x86_64", "ansible_system_capabilities": ["cap_chown", "cap_dac_override", "cap_dac_read_search", "cap_fowner", "cap_fsetid", "cap_kill", "cap_setgid", "cap_setuid", "cap_setpcap", "cap_linux_immutable", "cap_net_bind_service", "cap_net_broadcast", "cap_net_admin", "cap_net_raw", "cap_ipc_lock", "cap_ipc_owner", "cap_sys_module", "cap_sys_rawio", "cap_sys_chroot", "cap_sys_ptrace", "cap_sys_pacct", "cap_sys_admin", "cap_sys_boot", "cap_sys_nice", "cap_sys_resource", "cap_sys_time", "cap_sys_tty_config", "cap_mknod", "cap_lease", "cap_audit_write", "cap_audit_control", "cap_setfcap", "cap_mac_override", "cap_mac_admin", "cap_syslog", "35", "36+ep"], "ansible_all_ipv4_addresses": ["10.142.0.4"], "ansible_python_version": "2.7.5"}}\r\n', 'Shared connection to ansiblenode2 closed.\r\n')
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 ansiblenode2 '/bin/sh -c '"'"'rm -f -r /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-65248045798032/ > /dev/null 2>&1 && sleep 0'"'"''
+<ansiblenode1> (0, '\r\n{"invocation": {"module_args": {"filter": "*", "gather_subset": ["all"], "fact_path": "/etc/ansible/facts.d", "gather_timeout": 10}}, "ansible_facts": {"ansible_product_serial": "GoogleCloud-D0B55FB62F6BFD13B90329F741F65E95", "ansible_form_factor": "Other", "ansible_user_gecos": "root", "ansible_distribution_file_parsed": true, "ansible_fips": false, "ansible_service_mgr": "systemd", "ansible_user_id": "root", "ansible_selinux_python_present": true, "ansible_userspace_bits": "64", "ansible_ssh_host_key_rsa_public": "AAAAB3NzaC1yc2EAAAADAQABAAABAQCoIHujJTmQmrsD5IIKPIkC8IdKXNEyRh/6YK1R72LiznfXdeNGeXOuoySyWl+dzRzfdDg+m+NAXivvUabfB91mo4ycg/QEm/GqA/L/lB7vIJu81RJyow0Fe1245ZtLBD6BRPrWgJcRXgBRi/EijS1ppB9J9K/uV1frzFrc5Dlmohb9KTegqsrhxhITqn46EQdCzWJMJlvJ8m2bFYgtU2qDQXMjOaAywcjWndjjtlD5AC3a5CQ1WIzsUS7aWiR2YbIvtBLfmRHfZ8xEKO/l1BxXBmTOIiYZddiW1t+iehoVOY2VjEq/VGcKDbwVsDnZGTXvAKqGCvu/VYP6SLh0/htb", "gather_subset": ["all"], "ansible_ssh_host_key_ecdsa_public": "AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDNWP8vUMLbC2OF9RJ3XaRT/0UoWPfL12aCMYMv4VgHJryQzbi9XyzLpwjhCoeDovqSvdVlmBa1aTutQdFg0xYc=", "ansible_local": {}, "ansible_distribution_version": "7.6.1810", "ansible_domain": "cnl.com", "ansible_distribution_file_path": "/etc/redhat-release", "ansible_user_shell": "/bin/bash", "ansible_virtualization_type": "kvm", "ansible_real_user_id": 0, "ansible_processor_cores": 1, "ansible_virtualization_role": "guest", "ansible_distribution_file_variety": "RedHat", "ansible_dns": {"nameservers": ["169.254.169.254"], "search": ["us-east1-b.c.tensile-tenure-225805.internal", "c.tensile-tenure-225805.internal", "google.internal", "cnl.com"]}, "ansible_effective_group_id": 0, "ansible_is_chroot": false, "ansible_bios_version": "Google", "ansible_processor": ["0", "GenuineIntel", "Intel(R) Xeon(R) CPU @ 2.20GHz"], "ansible_date_time": {"weekday_number": "0", "iso8601_basic_short": "20190106T072434", "tz": "UTC", "weeknumber": "00", "hour": "07", "year": "2019", "minute": "24", "tz_offset": "+0000", "month": "01", "epoch": "1546759474", "iso8601_micro": "2019-01-06T07:24:34.001325Z", "weekday": "Sunday", "time": "07:24:34", "date": "2019-01-06", "iso8601": "2019-01-06T07:24:34Z", "day": "06", "iso8601_basic": "20190106T072434001229", "second": "34"}, "ansible_lo": {"features": {"tx_checksum_ipv4": "off [fixed]", "generic_receive_offload": "on", "tx_checksum_ipv6": "off [fixed]", "tx_scatter_gather_fraglist": "on [fixed]", "rx_all": "off [fixed]", "highdma": "on [fixed]", "rx_fcs": "off [fixed]", "tx_lockless": "on [fixed]", "tx_tcp_ecn_segmentation": "on", "rx_udp_tunnel_port_offload": "off [fixed]", "tx_tcp6_segmentation": "on", "tx_gso_robust": "off [fixed]", "tx_ipip_segmentation": "off [fixed]", "tx_tcp_mangleid_segmentation": "on", "tx_checksumming": "on", "vlan_challenged": "on [fixed]", "loopback": "on [fixed]", "fcoe_mtu": "off [fixed]", "scatter_gather": "on", "tx_checksum_sctp": "on [fixed]", "tx_vlan_stag_hw_insert": "off [fixed]", "rx_vlan_stag_hw_parse": "off [fixed]", "tx_gso_partial": "off [fixed]", "rx_gro_hw": "off [fixed]", "rx_vlan_stag_filter": "off [fixed]", "large_receive_offload": "off [fixed]", "tx_scatter_gather": "on [fixed]", "rx_checksumming": "on [fixed]", "tx_tcp_segmentation": "on", "netns_local": "on [fixed]", "busy_poll": "off [fixed]", "generic_segmentation_offload": "on", "tx_udp_tnl_segmentation": "off [fixed]", "tcp_segmentation_offload": "on", "l2_fwd_offload": "off [fixed]", "rx_vlan_offload": "off [fixed]", "ntuple_filters": "off [fixed]", "tx_gre_csum_segmentation": "off [fixed]", "tx_nocache_copy": "off [fixed]", "tx_udp_tnl_csum_segmentation": "off [fixed]", "udp_fragmentation_offload": "on", "tx_sctp_segmentation": "on", "tx_sit_segmentation": "off [fixed]", "tx_checksum_fcoe_crc": "off [fixed]", "hw_tc_offload": "off [fixed]", "tx_checksum_ip_generic": "on [fixed]", "tx_fcoe_segmentation": "off [fixed]", "rx_vlan_filter": "off [fixed]", "tx_vlan_offload": "off [fixed]", "receive_hashing": "off [fixed]", "tx_gre_segmentation": "off [fixed]"}, "hw_timestamp_filters": [], "mtu": 65536, "device": "lo", "promisc": false, "timestamping": ["rx_software", "software"], "ipv4": {"broadcast": "host", "netmask": "255.0.0.0", "network": "127.0.0.0", "address": "127.0.0.1"}, "ipv6": [{"scope": "host", "prefix": "128", "address": "::1"}], "active": true, "type": "loopback"}, "ansible_memtotal_mb": 991, "ansible_architecture": "x86_64", "ansible_device_links": {"masters": {}, "labels": {"sda1": ["\\\\x2f"]}, "ids": {"sda": ["google-ansiblenode1", "scsi-0Google_PersistentDisk_ansiblenode1"], "sda1": ["google-ansiblenode1-part1", "scsi-0Google_PersistentDisk_ansiblenode1-part1"]}, "uuids": {"sda1": ["393f50c7-5f64-4eb7-92ec-3d0e7c4b5eb4"]}}, "ansible_default_ipv4": {"macaddress": "42:01:0a:8e:00:03", "network": "10.142.0.3", "mtu": 1460, "broadcast": "10.142.0.3", "alias": "eth0", "netmask": "255.255.255.255", "address": "10.142.0.3", "interface": "eth0", "type": "ether", "gateway": "10.142.0.1"}, "ansible_swapfree_mb": 0, "ansible_default_ipv6": {}, "ansible_distribution_release": "Core", "ansible_system_vendor": "Google", "ansible_os_family": "RedHat", "ansible_cmdline": {"BOOT_IMAGE": "/boot/vmlinuz-3.10.0-957.1.3.el7.x86_64", "ro": true, "root": "UUID=393f50c7-5f64-4eb7-92ec-3d0e7c4b5eb4", "crashkernel": "auto", "console": "ttyS0,38400n8"}, "ansible_effective_user_id": 0, "ansible_user_gid": 0, "ansible_selinux": {"status": "enabled", "policyvers": 31, "type": "targeted", "mode": "permissive", "config_mode": "enforcing"}, "ansible_product_version": "NA", "ansible_apparmor": {"status": "disabled"}, "ansible_userspace_architecture": "x86_64", "ansible_product_uuid": "D0B55FB6-2F6B-FD13-B903-29F741F65E95", "ansible_fqdn": "ansnode1.cnl.com", "ansible_system": "Linux", "ansible_pkg_mgr": "yum", "ansible_memfree_mb": 279, "ansible_devices": {"sda": {"scheduler_mode": "deadline", "rotational": "1", "vendor": "Google", "sectors": "41943040", "links": {"masters": [], "labels": [], "ids": ["google-ansiblenode1", "scsi-0Google_PersistentDisk_ansiblenode1"], "uuids": []}, "sas_device_handle": null, "sas_address": null, "virtual": 1, "host": "", "sectorsize": "512", "removable": "0", "support_discard": "512", "model": "PersistentDisk", "partitions": {"sda1": {"sectorsize": 512, "uuid": "393f50c7-5f64-4eb7-92ec-3d0e7c4b5eb4", "links": {"masters": [], "labels": ["\\\\x2f"], "ids": ["google-ansiblenode1-part1", "scsi-0Google_PersistentDisk_ansiblenode1-part1"], "uuids": ["393f50c7-5f64-4eb7-92ec-3d0e7c4b5eb4"]}, "sectors": "41927602", "start": "2048", "holders": [], "size": "19.99 GB"}}, "holders": [], "size": "20.00 GB"}}, "ansible_user_uid": 0, "ansible_memory_mb": {"real": {"total": 991, "used": 712, "free": 279}, "swap": {"cached": 0, "total": 0, "free": 0, "used": 0}, "nocache": {"used": 302, "free": 689}}, "ansible_distribution": "CentOS", "ansible_user_dir": "/root", "ansible_env": {"USERNAME": "root", "LANG": "en_US.UTF-8", "TERM": "xterm", "SHELL": "/bin/bash", "SUDO_COMMAND": "/bin/sh -c echo BECOME-SUCCESS-yrwjhapxerbowlebeviiedbtiuyobiyd; /usr/bin/python /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-209840409050423/AnsiballZ_setup.py", "SHLVL": "1", "XDG_SESSION_ID": "60", "SUDO_UID": "1001", "SUDO_GID": "1002", "PWD": "/home/ansible", "LOGNAME": "root", "USER": "root", "MAIL": "/var/mail/ansible", "PATH": "/sbin:/bin:/usr/sbin:/usr/bin", "SUDO_USER": "ansible", "LS_COLORS": "rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=01;36:*.xspf=01;36:", "HOME": "/root", "_": "/usr/bin/python"}, "ansible_distribution_major_version": "7", "module_setup": true, "ansible_processor_count": 1, "ansible_hostname": "ansnode1", "ansible_processor_vcpus": 1, "ansible_swaptotal_mb": 0, "ansible_lsb": {}, "ansible_real_group_id": 0, "ansible_bios_date": "01/01/2011", "ansible_all_ipv6_addresses": ["fe80::4001:aff:fe8e:3"], "ansible_interfaces": ["lo", "eth0"], "ansible_uptime_seconds": 89177, "ansible_machine_id": "3d6410107e6f0fbfa6777e64d75c238c", "ansible_kernel": "3.10.0-957.1.3.el7.x86_64", "ansible_iscsi_iqn": "", "ansible_system_capabilities_enforced": "True", "ansible_python": {"executable": "/usr/bin/python", "version": {"micro": 5, "major": 2, "releaselevel": "final", "serial": 0, "minor": 7}, "type": "CPython", "has_sslcontext": true, "version_info": [2, 7, 5, "final", 0]}, "ansible_processor_threads_per_core": 1, "ansible_ssh_host_key_ed25519_public": "AAAAC3NzaC1lZDI1NTE5AAAAICqBs/xRDQbqY+daFY8QDmLsK7J/pNao+zfqadSgH6yZ", "ansible_mounts": [{"block_used": 443101, "uuid": "393f50c7-5f64-4eb7-92ec-3d0e7c4b5eb4", "size_total": 21456445440, "block_total": 5238390, "mount": "/", "block_available": 4795289, "size_available": 19641503744, "fstype": "xfs", "inode_total": 10481856, "options": "rw,seclabel,relatime,attr2,inode64,noquota", "device": "/dev/sda1", "inode_used": 55968, "block_size": 4096, "inode_available": 10425888}], "ansible_eth0": {"macaddress": "42:01:0a:8e:00:03", "features": {"tx_checksum_ipv4": "off [fixed]", "generic_receive_offload": "on", "tx_checksum_ipv6": "off [fixed]", "tx_scatter_gather_fraglist": "off [fixed]", "rx_all": "off [fixed]", "highdma": "on [fixed]", "rx_fcs": "off [fixed]", "tx_lockless": "off [fixed]", "tx_tcp_ecn_segmentation": "off [fixed]", "rx_udp_tunnel_port_offload": "off [fixed]", "tx_tcp6_segmentation": "on", "tx_gso_robust": "off [fixed]", "tx_ipip_segmentation": "off [fixed]", "tx_tcp_mangleid_segmentation": "off", "tx_checksumming": "on", "vlan_challenged": "off [fixed]", "loopback": "off [fixed]", "fcoe_mtu": "off [fixed]", "scatter_gather": "on", "tx_checksum_sctp": "off [fixed]", "tx_vlan_stag_hw_insert": "off [fixed]", "rx_vlan_stag_hw_parse": "off [fixed]", "tx_gso_partial": "off [fixed]", "rx_gro_hw": "off [fixed]", "rx_vlan_stag_filter": "off [fixed]", "large_receive_offload": "off [fixed]", "tx_scatter_gather": "on", "rx_checksumming": "on [fixed]", "tx_tcp_segmentation": "on", "netns_local": "off [fixed]", "busy_poll": "off [fixed]", "generic_segmentation_offload": "on", "tx_udp_tnl_segmentation": "off [fixed]", "tcp_segmentation_offload": "on", "l2_fwd_offload": "off [fixed]", "rx_vlan_offload": "off [fixed]", "ntuple_filters": "off [fixed]", "tx_gre_csum_segmentation": "off [fixed]", "tx_nocache_copy": "off", "tx_udp_tnl_csum_segmentation": "off [fixed]", "udp_fragmentation_offload": "off [fixed]", "tx_sctp_segmentation": "off [fixed]", "tx_sit_segmentation": "off [fixed]", "tx_checksum_fcoe_crc": "off [fixed]", "hw_tc_offload": "off [fixed]", "tx_checksum_ip_generic": "on", "tx_fcoe_segmentation": "off [fixed]", "rx_vlan_filter": "off [fixed]", "tx_vlan_offload": "off [fixed]", "receive_hashing": "off [fixed]", "tx_gre_segmentation": "off [fixed]"}, "pciid": "virtio1", "module": "virtio_net", "mtu": 1460, "device": "eth0", "promisc": false, "timestamping": ["rx_software", "software"], "ipv4": {"broadcast": "10.142.0.3", "netmask": "255.255.255.255", "network": "10.142.0.3", "address": "10.142.0.3"}, "ipv6": [{"scope": "link", "prefix": "64", "address": "fe80::4001:aff:fe8e:3"}], "active": true, "type": "ether", "hw_timestamp_filters": []}, "ansible_nodename": "ansnode1.cnl.com", "ansible_product_name": "Google Compute Engine", "ansible_machine": "x86_64", "ansible_system_capabilities": ["cap_chown", "cap_dac_override", "cap_dac_read_search", "cap_fowner", "cap_fsetid", "cap_kill", "cap_setgid", "cap_setuid", "cap_setpcap", "cap_linux_immutable", "cap_net_bind_service", "cap_net_broadcast", "cap_net_admin", "cap_net_raw", "cap_ipc_lock", "cap_ipc_owner", "cap_sys_module", "cap_sys_rawio", "cap_sys_chroot", "cap_sys_ptrace", "cap_sys_pacct", "cap_sys_admin", "cap_sys_boot", "cap_sys_nice", "cap_sys_resource", "cap_sys_time", "cap_sys_tty_config", "cap_mknod", "cap_lease", "cap_audit_write", "cap_audit_control", "cap_setfcap", "cap_mac_override", "cap_mac_admin", "cap_syslog", "35", "36+ep"], "ansible_all_ipv4_addresses": ["10.142.0.3"], "ansible_python_version": "2.7.5"}}\r\n', 'Shared connection to ansiblenode1 closed.\r\n')
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd ansiblenode1 '/bin/sh -c '"'"'rm -f -r /home/ansible/.ansible/tmp/ansible-tmp-1546759472.84-209840409050423/ > /dev/null 2>&1 && sleep 0'"'"''
+<ansiblenode2> (0, '', '')
+ok: [ansiblenode2]
+<ansiblenode1> (0, '', '')
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Create a inventory file] *****************************************************************************************************************************************
+task path: /home/ansible/dev/blockinfile.yml:5
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd ansiblenode1 '/bin/sh -c '"'"'echo ~ && sleep 0'"'"''
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 ansiblenode2 '/bin/sh -c '"'"'echo ~ && sleep 0'"'"''
+<ansiblenode1> (0, '/home/ansible\n', '')
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd ansiblenode1 '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /home/ansible/.ansible/tmp/ansible-tmp-1546759474.23-226916327636332 `" && echo ansible-tmp-1546759474.23-226916327636332="` echo /home/ansible/.ansible/tmp/ansible-tmp-1546759474.23-226916327636332 `" ) && sleep 0'"'"''
+<ansiblenode2> (0, '/home/ansible\n', '')
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 ansiblenode2 '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /home/ansible/.ansible/tmp/ansible-tmp-1546759474.26-262413348145449 `" && echo ansible-tmp-1546759474.26-262413348145449="` echo /home/ansible/.ansible/tmp/ansible-tmp-1546759474.26-262413348145449 `" ) && sleep 0'"'"''
+<ansiblenode1> (0, 'ansible-tmp-1546759474.23-226916327636332=/home/ansible/.ansible/tmp/ansible-tmp-1546759474.23-226916327636332\n', '')
+<ansiblenode2> (0, 'ansible-tmp-1546759474.26-262413348145449=/home/ansible/.ansible/tmp/ansible-tmp-1546759474.26-262413348145449\n', '')
+Using module file /usr/lib/python2.7/site-packages/ansible/modules/files/file.py
+<ansiblenode1> PUT /home/ansible/.ansible/tmp/ansible-local-31200c15bvx/tmpEk2FDu TO /home/ansible/.ansible/tmp/ansible-tmp-1546759474.23-226916327636332/AnsiballZ_file.py
+<ansiblenode1> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd '[ansiblenode1]'
+Using module file /usr/lib/python2.7/site-packages/ansible/modules/files/file.py
+<ansiblenode2> PUT /home/ansible/.ansible/tmp/ansible-local-31200c15bvx/tmpRAY3nq TO /home/ansible/.ansible/tmp/ansible-tmp-1546759474.26-262413348145449/AnsiballZ_file.py
+<ansiblenode2> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 '[ansiblenode2]'
+<ansiblenode2> (0, 'sftp> put /home/ansible/.ansible/tmp/ansible-local-31200c15bvx/tmpRAY3nq /home/ansible/.ansible/tmp/ansible-tmp-1546759474.26-262413348145449/AnsiballZ_file.py\n', '')
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 ansiblenode2 '/bin/sh -c '"'"'chmod u+x /home/ansible/.ansible/tmp/ansible-tmp-1546759474.26-262413348145449/ /home/ansible/.ansible/tmp/ansible-tmp-1546759474.26-262413348145449/AnsiballZ_file.py && sleep 0'"'"''
+<ansiblenode1> (0, 'sftp> put /home/ansible/.ansible/tmp/ansible-local-31200c15bvx/tmpEk2FDu /home/ansible/.ansible/tmp/ansible-tmp-1546759474.23-226916327636332/AnsiballZ_file.py\n', '')
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd ansiblenode1 '/bin/sh -c '"'"'chmod u+x /home/ansible/.ansible/tmp/ansible-tmp-1546759474.23-226916327636332/ /home/ansible/.ansible/tmp/ansible-tmp-1546759474.23-226916327636332/AnsiballZ_file.py && sleep 0'"'"''
+<ansiblenode2> (0, '', '')
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 -tt ansiblenode2 '/bin/sh -c '"'"'sudo -H -S -n -u root /bin/sh -c '"'"'"'"'"'"'"'"'echo BECOME-SUCCESS-yfkyilwystuyvzduenmvpaapeoqyvqza; /usr/bin/python /home/ansible/.ansible/tmp/ansible-tmp-1546759474.26-262413348145449/AnsiballZ_file.py'"'"'"'"'"'"'"'"' && sleep 0'"'"''
+<ansiblenode1> (0, '', '')
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd -tt ansiblenode1 '/bin/sh -c '"'"'sudo -H -S -n -u root /bin/sh -c '"'"'"'"'"'"'"'"'echo BECOME-SUCCESS-ojnmozycvghjxpzjfextwytjxipglyxz; /usr/bin/python /home/ansible/.ansible/tmp/ansible-tmp-1546759474.23-226916327636332/AnsiballZ_file.py'"'"'"'"'"'"'"'"' && sleep 0'"'"''
+Escalation succeeded
+Escalation succeeded
+<ansiblenode2> (0, '\r\n{"group": "root", "uid": 0, "dest": "/etc/jollyinv", "changed": true, "owner": "root", "state": "file", "gid": 0, "secontext": "unconfined_u:object_r:etc_t:s0", "mode": "0644", "invocation": {"module_args": {"directory_mode": null, "force": false, "remote_src": null, "_original_basename": null, "path": "/etc/jollyinv", "owner": null, "follow": true, "group": null, "unsafe_writes": null, "state": "touch", "content": null, "serole": null, "selevel": null, "setype": null, "access_time": null, "access_time_format": "%Y%m%d%H%M.%S", "modification_time": null, "regexp": null, "src": null, "seuser": null, "recurse": false, "_diff_peek": null, "delimiter": null, "mode": null, "modification_time_format": "%Y%m%d%H%M.%S", "attributes": null, "backup": null}}, "diff": {"after": {"path": "/etc/jollyinv", "state": "touch", "atime": 1546759475.033297, "mtime": 1546759475.033296}, "before": {"path": "/etc/jollyinv", "state": "absent", "atime": 1546759475.0324795, "mtime": 1546759475.0324795}}, "size": 0}\r\n', 'Shared connection to ansiblenode2 closed.\r\n')
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 ansiblenode2 '/bin/sh -c '"'"'rm -f -r /home/ansible/.ansible/tmp/ansible-tmp-1546759474.26-262413348145449/ > /dev/null 2>&1 && sleep 0'"'"''
+<ansiblenode1> (0, '\r\n{"group": "root", "uid": 0, "dest": "/etc/jollyinv", "changed": true, "owner": "root", "state": "file", "gid": 0, "secontext": "unconfined_u:object_r:etc_t:s0", "mode": "0644", "invocation": {"module_args": {"directory_mode": null, "force": false, "remote_src": null, "_original_basename": null, "path": "/etc/jollyinv", "owner": null, "follow": true, "group": null, "unsafe_writes": null, "state": "touch", "content": null, "serole": null, "selevel": null, "setype": null, "access_time": null, "access_time_format": "%Y%m%d%H%M.%S", "modification_time": null, "regexp": null, "src": null, "seuser": null, "recurse": false, "_diff_peek": null, "delimiter": null, "mode": null, "modification_time_format": "%Y%m%d%H%M.%S", "attributes": null, "backup": null}}, "diff": {"after": {"path": "/etc/jollyinv", "state": "touch", "atime": 1546759475.054887, "mtime": 1546759475.054886}, "before": {"path": "/etc/jollyinv", "state": "absent", "atime": 1546759475.0541294, "mtime": 1546759475.0541294}}, "size": 0}\r\n', 'Shared connection to ansiblenode1 closed.\r\n')
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd ansiblenode1 '/bin/sh -c '"'"'rm -f -r /home/ansible/.ansible/tmp/ansible-tmp-1546759474.23-226916327636332/ > /dev/null 2>&1 && sleep 0'"'"''
+<ansiblenode2> (0, '', '')
+changed: [ansiblenode2] => {
+    "changed": true,
+    "dest": "/etc/jollyinv",
+    "diff": {
+        "after": {
+            "atime": 1546759475.033297,
+            "mtime": 1546759475.033296,
+            "path": "/etc/jollyinv",
+            "state": "touch"
+        },
+        "before": {
+            "atime": 1546759475.0324795,
+            "mtime": 1546759475.0324795,
+            "path": "/etc/jollyinv",
+            "state": "absent"
+        }
+    },
+    "gid": 0,
+    "group": "root",
+    "invocation": {
+        "module_args": {
+            "_diff_peek": null,
+            "_original_basename": null,
+            "access_time": null,
+            "access_time_format": "%Y%m%d%H%M.%S",
+            "attributes": null,
+            "backup": null,
+            "content": null,
+            "delimiter": null,
+            "directory_mode": null,
+            "follow": true,
+            "force": false,
+            "group": null,
+            "mode": null,
+            "modification_time": null,
+            "modification_time_format": "%Y%m%d%H%M.%S",
+            "owner": null,
+            "path": "/etc/jollyinv",
+            "recurse": false,
+            "regexp": null,
+            "remote_src": null,
+            "selevel": null,
+            "serole": null,
+            "setype": null,
+            "seuser": null,
+            "src": null,
+            "state": "touch",
+            "unsafe_writes": null
+        }
+    },
+    "mode": "0644",
+    "owner": "root",
+    "secontext": "unconfined_u:object_r:etc_t:s0",
+    "size": 0,
+    "state": "file",
+    "uid": 0
+}
+<ansiblenode1> (0, '', '')
+changed: [ansiblenode1] => {
+    "changed": true,
+    "dest": "/etc/jollyinv",
+    "diff": {
+        "after": {
+            "atime": 1546759475.054887,
+            "mtime": 1546759475.054886,
+            "path": "/etc/jollyinv",
+            "state": "touch"
+        },
+        "before": {
+            "atime": 1546759475.0541294,
+            "mtime": 1546759475.0541294,
+            "path": "/etc/jollyinv",
+            "state": "absent"
+        }
+    },
+    "gid": 0,
+    "group": "root",
+    "invocation": {
+        "module_args": {
+            "_diff_peek": null,
+            "_original_basename": null,
+            "access_time": null,
+            "access_time_format": "%Y%m%d%H%M.%S",
+            "attributes": null,
+            "backup": null,
+            "content": null,
+            "delimiter": null,
+            "directory_mode": null,
+            "follow": true,
+            "force": false,
+            "group": null,
+            "mode": null,
+            "modification_time": null,
+            "modification_time_format": "%Y%m%d%H%M.%S",
+            "owner": null,
+            "path": "/etc/jollyinv",
+            "recurse": false,
+            "regexp": null,
+            "remote_src": null,
+            "selevel": null,
+            "serole": null,
+            "setype": null,
+            "seuser": null,
+            "src": null,
+            "state": "touch",
+            "unsafe_writes": null
+        }
+    },
+    "mode": "0644",
+    "owner": "root",
+    "secontext": "unconfined_u:object_r:etc_t:s0",
+    "size": 0,
+    "state": "file",
+    "uid": 0
+}
+
+TASK [Adding entry] ****************************************************************************************************************************************************
+task path: /home/ansible/dev/blockinfile.yml:9
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd ansiblenode1 '/bin/sh -c '"'"'echo ~ && sleep 0'"'"''
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 ansiblenode2 '/bin/sh -c '"'"'echo ~ && sleep 0'"'"''
+<ansiblenode1> (0, '/home/ansible\n', '')
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd ansiblenode1 '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /home/ansible/.ansible/tmp/ansible-tmp-1546759475.2-14283486741361 `" && echo ansible-tmp-1546759475.2-14283486741361="` echo /home/ansible/.ansible/tmp/ansible-tmp-1546759475.2-14283486741361 `" ) && sleep 0'"'"''
+<ansiblenode2> (0, '/home/ansible\n', '')
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 ansiblenode2 '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /home/ansible/.ansible/tmp/ansible-tmp-1546759475.24-209047147341940 `" && echo ansible-tmp-1546759475.24-209047147341940="` echo /home/ansible/.ansible/tmp/ansible-tmp-1546759475.24-209047147341940 `" ) && sleep 0'"'"''
+<ansiblenode1> (0, 'ansible-tmp-1546759475.2-14283486741361=/home/ansible/.ansible/tmp/ansible-tmp-1546759475.2-14283486741361\n', '')
+<ansiblenode2> (0, 'ansible-tmp-1546759475.24-209047147341940=/home/ansible/.ansible/tmp/ansible-tmp-1546759475.24-209047147341940\n', '')
+Using module file /usr/lib/python2.7/site-packages/ansible/modules/files/blockinfile.py
+<ansiblenode1> PUT /home/ansible/.ansible/tmp/ansible-local-31200c15bvx/tmptsm7Te TO /home/ansible/.ansible/tmp/ansible-tmp-1546759475.2-14283486741361/AnsiballZ_blockinfile.py
+<ansiblenode1> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd '[ansiblenode1]'
+Using module file /usr/lib/python2.7/site-packages/ansible/modules/files/blockinfile.py
+<ansiblenode2> PUT /home/ansible/.ansible/tmp/ansible-local-31200c15bvx/tmplKAwY2 TO /home/ansible/.ansible/tmp/ansible-tmp-1546759475.24-209047147341940/AnsiballZ_blockinfile.py
+<ansiblenode2> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 '[ansiblenode2]'
+<ansiblenode2> (0, 'sftp> put /home/ansible/.ansible/tmp/ansible-local-31200c15bvx/tmplKAwY2 /home/ansible/.ansible/tmp/ansible-tmp-1546759475.24-209047147341940/AnsiballZ_blockinfile.py\n', '')
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 ansiblenode2 '/bin/sh -c '"'"'chmod u+x /home/ansible/.ansible/tmp/ansible-tmp-1546759475.24-209047147341940/ /home/ansible/.ansible/tmp/ansible-tmp-1546759475.24-209047147341940/AnsiballZ_blockinfile.py && sleep 0'"'"''
+<ansiblenode1> (0, 'sftp> put /home/ansible/.ansible/tmp/ansible-local-31200c15bvx/tmptsm7Te /home/ansible/.ansible/tmp/ansible-tmp-1546759475.2-14283486741361/AnsiballZ_blockinfile.py\n', '')
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd ansiblenode1 '/bin/sh -c '"'"'chmod u+x /home/ansible/.ansible/tmp/ansible-tmp-1546759475.2-14283486741361/ /home/ansible/.ansible/tmp/ansible-tmp-1546759475.2-14283486741361/AnsiballZ_blockinfile.py && sleep 0'"'"''
+<ansiblenode1> (0, '', '')
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd -tt ansiblenode1 '/bin/sh -c '"'"'sudo -H -S -n -u root /bin/sh -c '"'"'"'"'"'"'"'"'echo BECOME-SUCCESS-hyndxhanjfphgvbqisiqymkilxpqeouh; /usr/bin/python /home/ansible/.ansible/tmp/ansible-tmp-1546759475.2-14283486741361/AnsiballZ_blockinfile.py'"'"'"'"'"'"'"'"' && sleep 0'"'"''
+<ansiblenode2> (0, '', '')
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 -tt ansiblenode2 '/bin/sh -c '"'"'sudo -H -S -n -u root /bin/sh -c '"'"'"'"'"'"'"'"'echo BECOME-SUCCESS-ouixouxxblrlpjahervzjsrlvrizfyho; /usr/bin/python /home/ansible/.ansible/tmp/ansible-tmp-1546759475.24-209047147341940/AnsiballZ_blockinfile.py'"'"'"'"'"'"'"'"' && sleep 0'"'"''
+Escalation succeeded
+Escalation succeeded
+<ansiblenode1> (0, '\r\n{"msg": "Block inserted", "diff": [{"after": "", "before_header": "/etc/jollyinv (content)", "after_header": "/etc/jollyinv (content)", "before": ""}, {"before_header": "/etc/jollyinv (file attributes)", "after_header": "/etc/jollyinv (file attributes)"}], "changed": true, "invocation": {"module_args": {"directory_mode": null, "force": null, "remote_src": null, "marker": "# Block has changed by Ansible in ansiblenode1", "regexp": null, "owner": null, "follow": false, "marker_begin": "BEGIN", "group": null, "insertbefore": null, "unsafe_writes": null, "create": false, "setype": null, "content": null, "serole": null, "state": "present", "selevel": null, "path": "/etc/jollyinv", "validate": null, "marker_end": "END", "src": null, "seuser": null, "delimiter": null, "mode": null, "insertafter": null, "attributes": null, "backup": false, "block": "10.x.x.x node8\\n10.x.x.x node7\\n"}}}\r\n', 'Shared connection to ansiblenode1 closed.\r\n')
+<ansiblenode1> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/eec7449ffd ansiblenode1 '/bin/sh -c '"'"'rm -f -r /home/ansible/.ansible/tmp/ansible-tmp-1546759475.2-14283486741361/ > /dev/null 2>&1 && sleep 0'"'"''
+<ansiblenode2> (0, '\r\n{"msg": "Block inserted", "diff": [{"after": "", "before_header": "/etc/jollyinv (content)", "after_header": "/etc/jollyinv (content)", "before": ""}, {"before_header": "/etc/jollyinv (file attributes)", "after_header": "/etc/jollyinv (file attributes)"}], "changed": true, "invocation": {"module_args": {"directory_mode": null, "force": null, "remote_src": null, "marker": "# Block has changed by Ansible in ansiblenode2", "regexp": null, "owner": null, "follow": false, "marker_begin": "BEGIN", "group": null, "insertbefore": null, "unsafe_writes": null, "create": false, "setype": null, "content": null, "serole": null, "state": "present", "selevel": null, "path": "/etc/jollyinv", "validate": null, "marker_end": "END", "src": null, "seuser": null, "delimiter": null, "mode": null, "insertafter": null, "attributes": null, "backup": false, "block": "10.x.x.x node8\\n10.x.x.x node7\\n"}}}\r\n', 'Shared connection to ansiblenode2 closed.\r\n')
+<ansiblenode2> ESTABLISH SSH CONNECTION FOR USER: None
+<ansiblenode2> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o ControlPath=/home/ansible/.ansible/cp/cf9c64b517 ansiblenode2 '/bin/sh -c '"'"'rm -f -r /home/ansible/.ansible/tmp/ansible-tmp-1546759475.24-209047147341940/ > /dev/null 2>&1 && sleep 0'"'"''
+<ansiblenode1> (0, '', '')
+<ansiblenode2> (0, '', '')
+changed: [ansiblenode1] => {
+    "changed": true,
+    "diff": [
+        {
+            "after": "",
+            "after_header": "/etc/jollyinv (content)",
+            "before": "",
+            "before_header": "/etc/jollyinv (content)"
+        },
+        {
+            "after_header": "/etc/jollyinv (file attributes)",
+            "before_header": "/etc/jollyinv (file attributes)"
+        }
+    ],
+    "invocation": {
+        "module_args": {
+            "attributes": null,
+            "backup": false,
+            "block": "10.x.x.x node8\n10.x.x.x node7\n",
+            "content": null,
+            "create": false,
+            "delimiter": null,
+            "directory_mode": null,
+            "follow": false,
+            "force": null,
+            "group": null,
+            "insertafter": null,
+            "insertbefore": null,
+            "marker": "# Block has changed by Ansible in ansiblenode1",
+            "marker_begin": "BEGIN",
+            "marker_end": "END",
+            "mode": null,
+            "owner": null,
+            "path": "/etc/jollyinv",
+            "regexp": null,
+            "remote_src": null,
+            "selevel": null,
+            "serole": null,
+            "setype": null,
+            "seuser": null,
+            "src": null,
+            "state": "present",
+            "unsafe_writes": null,
+            "validate": null
+        }
+    },
+    "msg": "Block inserted"
+}
+changed: [ansiblenode2] => {
+    "changed": true,
+    "diff": [
+        {
+            "after": "",
+            "after_header": "/etc/jollyinv (content)",
+            "before": "",
+            "before_header": "/etc/jollyinv (content)"
+        },
+        {
+            "after_header": "/etc/jollyinv (file attributes)",
+            "before_header": "/etc/jollyinv (file attributes)"
+        }
+    ],
+    "invocation": {
+        "module_args": {
+            "attributes": null,
+            "backup": false,
+            "block": "10.x.x.x node8\n10.x.x.x node7\n",
+            "content": null,
+            "create": false,
+            "delimiter": null,
+            "directory_mode": null,
+            "follow": false,
+            "force": null,
+            "group": null,
+            "insertafter": null,
+            "insertbefore": null,
+            "marker": "# Block has changed by Ansible in ansiblenode2",
+            "marker_begin": "BEGIN",
+            "marker_end": "END",
+            "mode": null,
+            "owner": null,
+            "path": "/etc/jollyinv",
+            "regexp": null,
+            "remote_src": null,
+            "selevel": null,
+            "serole": null,
+            "setype": null,
+            "seuser": null,
+            "src": null,
+            "state": "present",
+            "unsafe_writes": null,
+            "validate": null
+        }
+    },
+    "msg": "Block inserted"
+}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=3    changed=2    unreachable=0    failed=0
+ansiblenode2               : ok=3    changed=2    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ ansible-playbook blockinfile.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: blockinfile.yml **********************************************************************************************************************************************
+1 plays in blockinfile.yml
+
+PLAY [blobkinfile sample] **********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/blockinfile.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Create a inventory file] *****************************************************************************************************************************************
+task path: /home/ansible/dev/blockinfile.yml:5
+changed: [ansiblenode2] => {"changed": true, "dest": "/etc/jollyinv", "gid": 0, "group": "root", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:etc_t:s0", "size": 123, "state": "file", "uid": 0}
+changed: [ansiblenode1] => {"changed": true, "dest": "/etc/jollyinv", "gid": 0, "group": "root", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:etc_t:s0", "size": 123, "state": "file", "uid": 0}
+
+TASK [Adding entry] ****************************************************************************************************************************************************
+task path: /home/ansible/dev/blockinfile.yml:9
+changed: [ansiblenode2] => {"changed": true, "msg": "Block inserted"}
+changed: [ansiblenode1] => {"changed": true, "msg": "Block inserted"}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=3    changed=2    unreachable=0    failed=0
+ansiblenode2               : ok=3    changed=2    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ history
+    1  sudo su -
+    2  exit
+    3  sudo su -
+    4  sudo  yum install ansible -y
+    5  ansible --version
+    6  pwd
+    7  vi .vimrc
+    8  history
+    9  source .vimrc
+   10  man source
+   11  ssh-keygen
+   12  ssu-copy-id ansiblenode1
+   13  ssh-copy-id ansiblenode1
+   14  ssh-copy-id ansiblenode2
+   15  history
+   16  mkdir dev prod test
+   17  ls
+   18  cd dev
+   19  ls
+   20  ansible --version
+   21  pwd
+   22  cat /etc/ansible/ansible.cfg
+   23  touch ansible.cfg
+   24  ansible --version
+   25  ls
+   26  cat /etc/ansible/ansible.cfg
+   27  ls
+   28  vi ansible.cfg
+   29  vi jolly
+   30  ansible all --list
+   31  ansible ansiblenode1 -m ping
+   32  ls
+   33  cat ansible.cfg
+   34  vi jolly
+   35  ansible ansiblenode1 -m ping
+   36  vi jolly
+   37  ansible all --list
+   38  vi jolly
+   39  cat jolly
+   40  vi jolly
+   41  ansible all --list
+   42  ansible ansnode1 -m ping
+   43  ansible --version
+   44  vi jolly
+   45  vi ansible.cfg
+   46  ansible --version
+   47  ansible ansnode1 -m ping
+   48  vi ansible.cfg
+   49  vi jolly
+   50  ansible ansnode1 -m ping
+   51  ansible ansiblenode1 -m ping
+   52  ansible all -m ping
+   53  ansible-doc -l
+   54  ansible-doc -l | wc -l
+   55  ansible-doc ping
+   56  vi dolly
+   57  ls
+   58  vi jolly
+   59  ansible all -m ping
+   60  ansible bkup -m ping
+   61  ansible db -m ping
+   62  history
+   63  cat /etc/ansible/ansible.cfg
+   64  vi ansible.cfg
+   65  ls
+   66  cd dev
+   67  ls
+   68  ansible db -m yum -a "name=httpd state=latest"
+   69  vi ansible.cfg
+   70  ansible db -m yum -a "name=httpd state=latest"
+   71  ls
+   72  ls -ltr
+   73  cat ansiblerun.log
+   74  ls /etc/ansible/
+   75  vi
+   76  ls
+   77  ansible-playbook httpd.yml -C
+   78  ansible-playbook httpd.yml -v
+   79  vi ftp.yml
+   80  cat httpd.yml
+   81  vi ftp.yml
+   82  ansible-playbook ftp.yml -C
+   83  ansible-playbook ftp.yml -v
+   84  pwd
+   85  vi ftp.yml
+   86  ls
+   87  cat jolly
+   88  ansible-playbook ftp.yml -C
+   89  ls -ltr
+   90  cat ansiblerun.log
+   91  ls
+   92  mkdir playbooks
+   93  mv *.yml playbooks/
+   94  ls
+   95  cd  playbooks/
+   96  ls
+   97  vi copy.yml
+   98  cd ..
+   99  ansible-playbook playbooks/copy.yml -C
+  100  cd playbooks/
+  101  vi copy.
+  102  ls
+  103  vi copy.yml
+  104  cd ..
+  105  ansible-playbook playbooks/copy.yml --syntax
+  106  ansible-playbook playbooks/copy.yml -C
+  107  cd playbooks/
+  108  vi copy.
+  109  vi copy.yml
+  110  cd ..
+  111  ansible-playbook playbooks/copy.yml -C
+  112  vi copy.yml
+  113  mv playbooks/copy.yml .
+  114  vi copy.yml
+  115  ansible-playbook playbooks/copy.yml -C
+  116  ansible-playbook playbooks/copy.yml --syntax
+  117  ansible-playbook copy.yml --syntax
+  118  vi copy.yml
+  119  cat copy.yml
+  120  vi create_file.yml
+  121  vi copy.yml
+  122  ansible-playbook copy.yml --syntax
+  123  vi copy.yml
+  124  ansible-playbook copy.yml --syntax
+  125  vi copy.yml
+  126  ansible-playbook copy.yml --syntax
+  127  vi copy.yml
+  128  ansible-playbook copy.yml --syntax
+  129  vi copy.yml
+  130  ansible-playbook create_file.yml --syntax
+  131  vi create_file.yml
+  132  ansible-playbook create_file.yml --syntax
+  133  ansible-playbook copy.yml --syntax
+  134  vi create_file.yml
+  135  ls
+  136  vi jolly
+  137  ansible-playbook copy.yml --syntax
+  138  ansible-playbook create_file.yml --syntax
+  139  vi create_file.yml
+  140  cat create_file.yml
+  141  cat copy.yml
+  142  cat create_file.yml
+  143  vi create_file.yml
+  144  ansible-playbook create_file.yml --syntax
+  145  ansible-playbook copy.yml --syntax
+  146  cat create_file.yml
+  147  vi file.yml
+  148  ansible-playbook file.yml --syntax
+  149  vi copy.yml
+  150  ansible-playbook copy.yml --syntax
+  151  ansible-playbook file.yml -C
+  152  ansible-playbook copy.yml -C
+  153  vi copy.yml
+  154  ansible-playbook copy.yml -C
+  155  vi file.yml
+  156  cat copy.
+  157  cat copy.yml
+  158  cat file.yml
+  159  vi file.yml
+  160  ls
+  161  cat playbooks/ftp.yml
+  162  ls
+  163  cd ..
+  164  ls
+  165  cd dev/
+  166  ls
+  167  vi file.yml
+  168  vi jolly
+  169  vi file.yml
+  170  vi copy.yml
+  171  ansible-playbook copy.yml -C
+  172  ansible-playbook file.yml -C
+  173  cat file.yml
+  174  vi copy.yml
+  175  ansible-playbook copy.yml -C
+  176  vi copy.yml
+  177  ansible-playbook copy.yml -C
+  178  vi copy.yml
+  179  ansible-playbook copy.yml -C
+  180  vi copy.yml
+  181  ansible-playbook copy.yml -C
+  182  vi copy.yml
+  183  pwd
+  184  cd ..
+  185  ls
+  186  pwd
+  187  cd dev
+  188  ls
+  189  more file.yml
+  190  vi copy.yml
+  191  ansible-playbook copy.yml -C
+  192  vi copy.yml
+  193  ansible-playbook copy.yml -C
+  194  ansible-playbook copy.yml -vv
+  195  ls
+  196  rm copy.retry
+  197  ansible-playbook copy.yml -vv
+  198  pwd
+  199  ls
+  200  rm create_file.yml
+  201  ls
+  202  mv copy.yml playbooks/
+  203  ls
+  204  cd ..
+  205  git clone https://github.com/chefgs/ansible_playbooks.git
+  206  yum install git -y
+  207  sudo yum install git -y
+  208  git clone https://github.com/chefgs/ansible_playbooks.git
+  209  cd ansible_playbooks/
+  210  ls
+  211  mkdir ansible_session
+  212  pwd
+  213  cd ..
+  214  ls
+  215  cp dev/ /home/ansible/ansible_playbooks/ansible_session/
+  216  cp dev/ /home/ansible/ansible_playbooks/ansible_session/ -R
+  217  cd /home/ansible/ansible_playbooks/ansible_session/
+  218  ls
+  219  cd dev/
+  220  git status
+  221  cd /home/ansible/ansible_playbooks/ansible_session/
+  222  cd ..
+  223  git status
+  224  git add .
+  225  git commit -m "Session code"
+  226  git config --global user.email "g.gsaravanan@gmail.com"
+  227  git config --global user.name "Saravanan"
+  228  git commit -m "Session code"
+  229  git push origin master
+  230  ls
+  231  cd dev
+  232  ls
+  233  cat file.yml
+  234  ansible-playbook file.yml --syntax
+  235  vi file.yml
+  236  ansible-playbook file.yml --vv
+  237  ansible-playbook file.yml -vv
+  238  vi copyfile.yml
+  239  ls -l /
+  240  ls
+  241  vi bkup-sudo.yml
+  242  ansible-playbook bkup-sudo.yml --syntax
+  243  vi bkup-sudo.yml
+  244  ansible-playbook bkup-sudo.yml -C
+  245  vi bkup-sudo.yml
+  246  ansible-playbook bkup-sudo.yml -C
+  247  ansible-playbook bkup-sudo.yml -vv
+  248  vi fetch.yml
+  249  ansible-playbook fetch.yml -vv
+  250  ls -ltr
+  251  cd dev
+  252  vi blockinfile.yml
+  253  ansible-playbook blockinfile.yml --syntax
+  254  ansible-playbook blockinfile.yml -vvv
+  255  ansible-playbook blockinfile.yml -vv
+  256  history
+[ansible@ansiblehost dev]$  ansible all -m shell -a "cat /etc/jollyinv"
+ansiblenode2 | CHANGED | rc=0 >>
+# Block has changed by Ansible in ansiblenode2
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode2
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode2
+
+ansiblenode1 | CHANGED | rc=0 >>
+# Block has changed by Ansible in ansiblenode1
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode1
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode1
+
+[ansible@ansiblehost dev]$ vi blockinfile.yml
+[ansible@ansiblehost dev]$ ansible-playbook blockinfile.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: blockinfile.yml **********************************************************************************************************************************************
+1 plays in blockinfile.yml
+
+PLAY [blobkinfile sample] **********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/blockinfile.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Create a inventory file] *****************************************************************************************************************************************
+task path: /home/ansible/dev/blockinfile.yml:5
+changed: [ansiblenode1] => {"changed": true, "dest": "/etc/jollyinv", "gid": 0, "group": "root", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:etc_t:s0", "size": 200, "state": "file", "uid": 0}
+changed: [ansiblenode2] => {"changed": true, "dest": "/etc/jollyinv", "gid": 0, "group": "root", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:etc_t:s0", "size": 200, "state": "file", "uid": 0}
+
+TASK [Adding entry] ****************************************************************************************************************************************************
+task path: /home/ansible/dev/blockinfile.yml:9
+changed: [ansiblenode1] => {"changed": true, "msg": "Block inserted"}
+changed: [ansiblenode2] => {"changed": true, "msg": "Block inserted"}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=3    changed=2    unreachable=0    failed=0
+ansiblenode2               : ok=3    changed=2    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$  ansible all -m shell -a "cat /etc/jollyinv"
+ansiblenode2 | CHANGED | rc=0 >>
+# Block has changed by Ansible in ansiblenode2
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode2
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode2
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode2
+
+ansiblenode1 | CHANGED | rc=0 >>
+# Block has changed by Ansible in ansiblenode1
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode1
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode1
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode1
+
+[ansible@ansiblehost dev]$ vi blockinfile.yml
+[ansible@ansiblehost dev]$ ansible-playbook blockinfile.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: blockinfile.yml **********************************************************************************************************************************************
+1 plays in blockinfile.yml
+
+PLAY [blobkinfile sample] **********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/blockinfile.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Create a inventory file] *****************************************************************************************************************************************
+task path: /home/ansible/dev/blockinfile.yml:5
+changed: [ansiblenode2] => {"changed": true, "dest": "/etc/jollyinv", "gid": 0, "group": "root", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:etc_t:s0", "size": 277, "state": "file", "uid": 0}
+changed: [ansiblenode1] => {"changed": true, "dest": "/etc/jollyinv", "gid": 0, "group": "root", "mode": "0644", "owner": "root", "secontext": "unconfined_u:object_r:etc_t:s0", "size": 277, "state": "file", "uid": 0}
+
+TASK [Adding entry] ****************************************************************************************************************************************************
+task path: /home/ansible/dev/blockinfile.yml:9
+changed: [ansiblenode2] => {"changed": true, "msg": "Block inserted"}
+changed: [ansiblenode1] => {"changed": true, "msg": "Block inserted"}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=3    changed=2    unreachable=0    failed=0
+ansiblenode2               : ok=3    changed=2    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$  ansible all -m shell -a "cat /etc/jollyinv"
+ansiblenode2 | CHANGED | rc=0 >>
+# Block has changed by Ansible in ansiblenode2
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode2
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode2
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode2
+# BEGIN ANSIBLE MANAGED BLOCK
+10.x.x.x node8
+10.x.x.x node7
+# END ANSIBLE MANAGED BLOCK
+
+ansiblenode1 | CHANGED | rc=0 >>
+# Block has changed by Ansible in ansiblenode1
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode1
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode1
+10.x.x.x node8
+10.x.x.x node7
+# Block has changed by Ansible in ansiblenode1
+# BEGIN ANSIBLE MANAGED BLOCK
+10.x.x.x node8
+10.x.x.x node7
+# END ANSIBLE MANAGED BLOCK
+
+[ansible@ansiblehost dev]$ cat lineinfile.yml
+---
+- name: Line in file sample
+  hosts: all
+  tasks:
+   - name: Change line
+     lineinfile:
+       path: /var/tmp/sample_dir/samplefile.txt
+       regexp: "Sample"
+       line: "**Sample modified**"
+...
+[ansible@ansiblehost dev]$ vi replace.yml
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbooks tags.yml --syntax
+-bash: ansible-playbooks: command not found
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml --syntax
+ERROR! Syntax Error while loading YAML.
+  mapping values are not allowed in this context
+
+The error appears to have been in '/home/ansible/dev/tags.yml': line 3, column 8, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+- Name tags playbook sample
+  hosts: all
+       ^ here
+
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml --syntax
+
+playbook: tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook
+Usage: ansible-playbook [options] playbook.yml [playbook2 ...]
+
+Runs Ansible playbooks, executing the defined tasks on the targeted hosts.
+
+Options:
+  --ask-vault-pass      ask for vault password
+  -C, --check           don't make any changes; instead, try to predict some
+                        of the changes that may occur
+  -D, --diff            when changing (small) files and templates, show the
+                        differences in those files; works great with --check
+  -e EXTRA_VARS, --extra-vars=EXTRA_VARS
+                        set additional variables as key=value or YAML/JSON, if
+                        filename prepend with @
+  --flush-cache         clear the fact cache for every host in inventory
+  --force-handlers      run handlers even if a task fails
+  -f FORKS, --forks=FORKS
+                        specify number of parallel processes to use
+                        (default=5)
+  -h, --help            show this help message and exit
+  -i INVENTORY, --inventory=INVENTORY, --inventory-file=INVENTORY
+                        specify inventory host path or comma separated host
+                        list. --inventory-file is deprecated
+  -l SUBSET, --limit=SUBSET
+                        further limit selected hosts to an additional pattern
+  --list-hosts          outputs a list of matching hosts; does not execute
+                        anything else
+  --list-tags           list all available tags
+  --list-tasks          list all tasks that would be executed
+  -M MODULE_PATH, --module-path=MODULE_PATH
+                        prepend colon-separated path(s) to module library
+                        (default=[u'/home/ansible/.ansible/plugins/modules',
+                        u'/usr/share/ansible/plugins/modules'])
+  --skip-tags=SKIP_TAGS
+                        only run plays and tasks whose tags do not match these
+                        values
+  --start-at-task=START_AT_TASK
+                        start the playbook at the task matching this name
+  --step                one-step-at-a-time: confirm each task before running
+  --syntax-check        perform a syntax check on the playbook, but do not
+                        execute it
+  -t TAGS, --tags=TAGS  only run plays and tasks tagged with these values
+  --vault-id=VAULT_IDS  the vault identity to use
+  --vault-password-file=VAULT_PASSWORD_FILES
+                        vault password file
+  -v, --verbose         verbose mode (-vvv for more, -vvvv to enable
+                        connection debugging)
+  --version             show program's version number and exit
+
+  Connection Options:
+    control as whom and how to connect to hosts
+
+    -k, --ask-pass      ask for connection password
+    --private-key=PRIVATE_KEY_FILE, --key-file=PRIVATE_KEY_FILE
+                        use this file to authenticate the connection
+    -u REMOTE_USER, --user=REMOTE_USER
+                        connect as this user (default=None)
+    -c CONNECTION, --connection=CONNECTION
+                        connection type to use (default=smart)
+    -T TIMEOUT, --timeout=TIMEOUT
+                        override the connection timeout in seconds
+                        (default=10)
+    --ssh-common-args=SSH_COMMON_ARGS
+                        specify common arguments to pass to sftp/scp/ssh (e.g.
+                        ProxyCommand)
+    --sftp-extra-args=SFTP_EXTRA_ARGS
+                        specify extra arguments to pass to sftp only (e.g. -f,
+                        -l)
+    --scp-extra-args=SCP_EXTRA_ARGS
+                        specify extra arguments to pass to scp only (e.g. -l)
+    --ssh-extra-args=SSH_EXTRA_ARGS
+                        specify extra arguments to pass to ssh only (e.g. -R)
+
+  Privilege Escalation Options:
+    control how and which user you become as on target hosts
+
+    -s, --sudo          run operations with sudo (nopasswd) (deprecated, use
+                        become)
+    -U SUDO_USER, --sudo-user=SUDO_USER
+                        desired sudo user (default=root) (deprecated, use
+                        become)
+    -S, --su            run operations with su (deprecated, use become)
+    -R SU_USER, --su-user=SU_USER
+                        run operations with su as this user (default=None)
+                        (deprecated, use become)
+    -b, --become        run operations with become (does not imply password
+                        prompting)
+    --become-method=BECOME_METHOD
+                        privilege escalation method to use (default=sudo),
+                        valid choices: [ sudo | su | pbrun | pfexec | doas |
+                        dzdo | ksu | runas | pmrun | enable | machinectl ]
+    --become-user=BECOME_USER
+                        run operations as this user (default=root)
+    --ask-sudo-pass     ask for sudo password (deprecated, use become)
+    --ask-su-pass       ask for su password (deprecated, use become)
+    -K, --ask-become-pass
+                        ask for privilege escalation password
+ERROR! You must specify a playbook file to run
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml -t ^C
+[ansible@ansiblehost dev]$ cat tags.yml
+---
+- name: Tags playbook sample
+  hosts: all
+  tasks:
+   - name: Install packages
+     yum:
+       name: "{{ name }}"
+       state: installed
+     loop:
+      - httpd
+      - memcached
+     tags:
+      - packages
+   - name: Create conf files
+     lineinfile:
+       path: /var/tmp/{{ inventory_hostname }}.conf
+     tags:
+      - create_conf
+...
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml -t packages -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: tags.yml *****************************************************************************************************************************************************
+1 plays in tags.yml
+
+PLAY [Tags playbook sample] ********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:2
+ok: [ansiblenode1]
+ok: [ansiblenode2]
+META: ran handlers
+
+TASK [Install packages] ************************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:5
+fatal: [ansiblenode2]: FAILED! => {"msg": "The task includes an option with an undefined variable. The error was: 'name' is undefined\n\nThe error appears to have been in '/home/ansible/dev/tags.yml': line 5, column 6, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n  tasks:\n   - name: Install packages\n     ^ here\n"}
+fatal: [ansiblenode1]: FAILED! => {"msg": "The task includes an option with an undefined variable. The error was: 'name' is undefined\n\nThe error appears to have been in '/home/ansible/dev/tags.yml': line 5, column 6, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n  tasks:\n   - name: Install packages\n     ^ here\n"}
+        to retry, use: --limit @/home/ansible/dev/tags.retry
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=1    changed=0    unreachable=0    failed=1
+ansiblenode2               : ok=1    changed=0    unreachable=0    failed=1
+
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml -t packages -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: tags.yml *****************************************************************************************************************************************************
+1 plays in tags.yml
+
+PLAY [Tags playbook sample] ********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Install packages] ************************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:5
+ok: [ansiblenode2] => (item=httpd) => {"changed": false, "item": "httpd", "msg": "", "rc": 0, "results": ["httpd-2.4.6-88.el7.centos.x86_64 providing httpd is already installed"]}
+ok: [ansiblenode1] => (item=httpd) => {"changed": false, "item": "httpd", "msg": "", "rc": 0, "results": ["httpd-2.4.6-88.el7.centos.x86_64 providing httpd is already installed"]}
+changed: [ansiblenode2] => (item=memcached) => {"changed": true, "item": "memcached", "msg": "", "rc": 0, "results": ["Loaded plugins: fastestmirror\nLoading mirror speeds from cached hostfile\n * base: mirrors.advancedhosters.com\n * epel: mirror.umd.edu\n * extras: mirrors.advancedhosters.com\n * updates: mirrors.advancedhosters.com\nResolving Dependencies\n--> Running transaction check\n---> Package memcached.x86_64 0:1.4.15-10.el7_3.1 will be installed\n--> Processing Dependency: libevent-2.0.so.5()(64bit) for package: memcached-1.4.15-10.el7_3.1.x86_64\n--> Running transaction check\n---> Package libevent.x86_64 0:2.0.21-4.el7 will be installed\n--> Finished Dependency Resolution\n\nDependencies Resolved\n\n================================================================================\n Package           Arch           Version                    Repository    Size\n================================================================================\nInstalling:\n memcached         x86_64         1.4.15-10.el7_3.1          base          85 k\nInstalling for dependencies:\n libevent          x86_64         2.0.21-4.el7               base         214 k\n\nTransaction Summary\n================================================================================\nInstall  1 Package (+1 Dependent package)\n\nTotal download size: 299 k\nInstalled size: 901 k\nDownloading packages:\n--------------------------------------------------------------------------------\nTotal                                              853 kB/s | 299 kB  00:00     \nRunning transaction check\nRunning transaction test\nTransaction test succeeded\nRunning transaction\n  Installing : libevent-2.0.21-4.el7.x86_64                                 1/2 \n  Installing : memcached-1.4.15-10.el7_3.1.x86_64                           2/2 \n  Verifying  : memcached-1.4.15-10.el7_3.1.x86_64                           1/2 \n  Verifying  : libevent-2.0.21-4.el7.x86_64                                 2/2 \n\nInstalled:\n  memcached.x86_64 0:1.4.15-10.el7_3.1                                          \n\nDependency Installed:\n  libevent.x86_64 0:2.0.21-4.el7                                                \n\nComplete!\n"]}
+changed: [ansiblenode1] => (item=memcached) => {"changed": true, "item": "memcached", "msg": "", "rc": 0, "results": ["Loaded plugins: fastestmirror\nLoading mirror speeds from cached hostfile\n * base: mirrors.usc.edu\n * epel: mirror.us.leaseweb.net\n * extras: mirror.fileplanet.com\n * updates: mirror.scalabledns.com\nResolving Dependencies\n--> Running transaction check\n---> Package memcached.x86_64 0:1.4.15-10.el7_3.1 will be installed\n--> Processing Dependency: libevent-2.0.so.5()(64bit) for package: memcached-1.4.15-10.el7_3.1.x86_64\n--> Running transaction check\n---> Package libevent.x86_64 0:2.0.21-4.el7 will be installed\n--> Finished Dependency Resolution\n\nDependencies Resolved\n\n================================================================================\n Package           Arch           Version                    Repository    Size\n================================================================================\nInstalling:\n memcached         x86_64         1.4.15-10.el7_3.1          base          85 k\nInstalling for dependencies:\n libevent          x86_64         2.0.21-4.el7               base         214 k\n\nTransaction Summary\n================================================================================\nInstall  1 Package (+1 Dependent package)\n\nTotal download size: 299 k\nInstalled size: 901 k\nDownloading packages:\n--------------------------------------------------------------------------------\nTotal                                              444 kB/s | 299 kB  00:00     \nRunning transaction check\nRunning transaction test\nTransaction test succeeded\nRunning transaction\n  Installing : libevent-2.0.21-4.el7.x86_64                                 1/2 \n  Installing : memcached-1.4.15-10.el7_3.1.x86_64                           2/2 \n  Verifying  : memcached-1.4.15-10.el7_3.1.x86_64                           1/2 \n  Verifying  : libevent-2.0.21-4.el7.x86_64                                 2/2 \n\nInstalled:\n  memcached.x86_64 0:1.4.15-10.el7_3.1                                          \n\nDependency Installed:\n  libevent.x86_64 0:2.0.21-4.el7                                                \n\nComplete!\n"]}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=2    changed=1    unreachable=0    failed=0
+ansiblenode2               : ok=2    changed=1    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ cat tags.yml
+---
+- name: Tags playbook sample
+  hosts: all
+  tasks:
+   - name: Install packages
+     yum:
+       name: "{{ item }}"
+       state: installed
+     loop:
+      - httpd
+      - memcached
+     tags:
+      - packages
+   - name: Create conf files
+     lineinfile:
+       path: /var/tmp/{{ inventory_hostname }}.conf
+     tags:
+      - create_conf
+...
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml -t create_conf -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: tags.yml *****************************************************************************************************************************************************
+1 plays in tags.yml
+
+PLAY [Tags playbook sample] ********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Create conf files] ***********************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:14
+fatal: [ansiblenode2]: FAILED! => {"changed": false, "msg": "line is required with state=present"}
+fatal: [ansiblenode1]: FAILED! => {"changed": false, "msg": "line is required with state=present"}
+        to retry, use: --limit @/home/ansible/dev/tags.retry
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=1    changed=0    unreachable=0    failed=1
+ansiblenode2               : ok=1    changed=0    unreachable=0    failed=1
+
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml -t create_conf -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: tags.yml *****************************************************************************************************************************************************
+1 plays in tags.yml
+
+PLAY [Tags playbook sample] ********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Create conf files] ***********************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:14
+fatal: [ansiblenode2]: FAILED! => {"changed": false, "msg": "line is required with state=present"}
+fatal: [ansiblenode1]: FAILED! => {"changed": false, "msg": "line is required with state=present"}
+        to retry, use: --limit @/home/ansible/dev/tags.retry
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=1    changed=0    unreachable=0    failed=1
+ansiblenode2               : ok=1    changed=0    unreachable=0    failed=1
+
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml -t create_conf -vv^C
+[ansible@ansiblehost dev]$ cat lineinfile.yml
+---
+- name: Line in file sample
+  hosts: all
+  tasks:
+   - name: Change line
+     lineinfile:
+       path: /var/tmp/sample_dir/samplefile.txt
+       regexp: "Sample"
+       line: "**Sample modified**"
+...
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml -t create_conf -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: tags.yml *****************************************************************************************************************************************************
+1 plays in tags.yml
+
+PLAY [Tags playbook sample] ********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:2
+ok: [ansiblenode2]
+ok: [ansiblenode1]
+META: ran handlers
+
+TASK [Create conf files] ***********************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:14
+fatal: [ansiblenode2]: FAILED! => {"changed": false, "msg": "Destination /var/tmp/ansiblenode2.conf does not exist !", "rc": 257}
+fatal: [ansiblenode1]: FAILED! => {"changed": false, "msg": "Destination /var/tmp/ansiblenode1.conf does not exist !", "rc": 257}
+        to retry, use: --limit @/home/ansible/dev/tags.retry
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=1    changed=0    unreachable=0    failed=1
+ansiblenode2               : ok=1    changed=0    unreachable=0    failed=1
+
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml -t create_conf -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+ERROR! conflicting action statements: lineinfile, file
+
+The error appears to have been in '/home/ansible/dev/tags.yml': line 14, column 6, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+      - packages
+   - name: Create conf files
+     ^ here
+
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml -t create_conf -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+ERROR! conflicting action statements: lineinfile, file
+
+The error appears to have been in '/home/ansible/dev/tags.yml': line 14, column 6, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+      - packages
+   - name: Create conf files
+     ^ here
+
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ls
+ansible.cfg     bkup-sudo.yml    content.yml   create_file_copy_content.yml  fetch.yml  jolly           playbooks    sample.txt  tags.yml
+ansiblerun.log  blockinfile.yml  copyfile.yml  fetch_with_node.yml           file.yml   lineinfile.yml  replace.yml  tags.retry
+[ansible@ansiblehost dev]$ cat file.yml
+---
+- name: Create a file into client nodes
+  hosts: localhost
+  tasks:
+   - name: Create file
+     file:
+      path: /home/ansible/sample2.txt
+      state: touch
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml --syntax
+ERROR! conflicting action statements: lineinfile, file
+
+The error appears to have been in '/home/ansible/dev/tags.yml': line 14, column 6, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+      - packages
+   - name: Create conf files
+     ^ here
+
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ cat tags.yml
+---
+- name: Tags playbook sample
+  hosts: all
+  tasks:
+   - name: Install packages
+     yum:
+       name: "{{ item }}"
+       state: installed
+     loop:
+      - httpd
+      - memcached
+     tags:
+      - packages
+   - name: Create conf files
+     file:
+       path: "/var/tmp/{{ inventory_hostname }}.conf"
+       state: touch
+     lineinfile:
+       path: "/var/tmp/{{ inventory_hostname }}.conf"
+       line: "# Config file content"
+     tags:
+      - create_conf
+...
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml --syntax
+
+playbook: tags.yml
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml --syntax
+ERROR! conflicting action statements: lineinfile, file
+
+The error appears to have been in '/home/ansible/dev/tags.yml': line 14, column 6, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+      - packages
+   - name: Create conf files
+     ^ here
+
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml --syntax
+ERROR! conflicting action statements: lineinfile, file
+
+The error appears to have been in '/home/ansible/dev/tags.yml': line 15, column 6, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+
+   - name: Create conf files
+     ^ here
+
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ cat file.yml
+---
+- name: Create a file into client nodes
+  hosts: localhost
+  tasks:
+   - name: Create file
+     file:
+      path: /home/ansible/sample2.txt
+      state: touch
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml --syntax
+ERROR! conflicting action statements: lineinfile, file
+
+The error appears to have been in '/home/ansible/dev/tags.yml': line 15, column 6, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+
+   - name: Create conf files
+     ^ here
+
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ vi tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml --syntax
+
+playbook: tags.yml
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: tags.yml *****************************************************************************************************************************************************
+1 plays in tags.yml
+
+PLAY [Tags playbook sample] ********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:2
+ok: [ansiblenode1]
+ok: [ansiblenode2]
+META: ran handlers
+
+TASK [Install packages] ************************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:5
+ok: [ansiblenode1] => (item=httpd) => {"changed": false, "item": "httpd", "msg": "", "rc": 0, "results": ["httpd-2.4.6-88.el7.centos.x86_64 providing httpd is already installed"]}
+ok: [ansiblenode2] => (item=httpd) => {"changed": false, "item": "httpd", "msg": "", "rc": 0, "results": ["httpd-2.4.6-88.el7.centos.x86_64 providing httpd is already installed"]}
+ok: [ansiblenode1] => (item=memcached) => {"changed": false, "item": "memcached", "msg": "", "rc": 0, "results": ["memcached-1.4.15-10.el7_3.1.x86_64 providing memcached is already installed"]}
+ok: [ansiblenode2] => (item=memcached) => {"changed": false, "item": "memcached", "msg": "", "rc": 0, "results": ["memcached-1.4.15-10.el7_3.1.x86_64 providing memcached is already installed"]}
+
+TASK [Create conf files] ***********************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:15
+changed: [ansiblenode1] => {"backup": "", "changed": true, "msg": "line added"}
+changed: [ansiblenode2] => {"backup": "", "changed": true, "msg": "line added"}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=3    changed=1    unreachable=0    failed=0
+ansiblenode2               : ok=3    changed=1    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml -t create_conf -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: tags.yml *****************************************************************************************************************************************************
+1 plays in tags.yml
+
+PLAY [Tags playbook sample] ********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:2
+ok: [ansiblenode1]
+ok: [ansiblenode2]
+META: ran handlers
+
+TASK [Create conf files] ***********************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:15
+ok: [ansiblenode2] => {"backup": "", "changed": false, "msg": ""}
+ok: [ansiblenode1] => {"backup": "", "changed": false, "msg": ""}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=2    changed=0    unreachable=0    failed=0
+ansiblenode2               : ok=2    changed=0    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ cat tags.yml
+---
+- name: Tags playbook sample
+  hosts: all
+  tasks:
+   - name: Install packages
+     yum:
+       name: "{{ item }}"
+       state: installed
+     loop:
+      - httpd
+      - memcached
+     tags:
+      - packages
+
+   - name: Create conf files
+     lineinfile:
+       path: "/var/tmp/{{ inventory_hostname }}.conf"
+       line: "# Config file content"
+       create: yes
+     tags:
+      - create_conf
+...
+[ansible@ansiblehost dev]$ ansible-playbook tags.yml -t create_conf -vv
+ansible-playbook 2.7.5
+  config file = /home/ansible/dev/ansible.cfg
+  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+Using /home/ansible/dev/ansible.cfg as config file
+/home/ansible/dev/jolly did not meet host_list requirements, check plugin documentation if this is unexpected
+/home/ansible/dev/jolly did not meet script requirements, check plugin documentation if this is unexpected
+
+PLAYBOOK: tags.yml *****************************************************************************************************************************************************
+1 plays in tags.yml
+
+PLAY [Tags playbook sample] ********************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:2
+ok: [ansiblenode1]
+ok: [ansiblenode2]
+META: ran handlers
+
+TASK [Create conf files] ***********************************************************************************************************************************************
+task path: /home/ansible/dev/tags.yml:15
+ok: [ansiblenode2] => {"backup": "", "changed": false, "msg": ""}
+ok: [ansiblenode1] => {"backup": "", "changed": false, "msg": ""}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *************************************************************************************************************************************************************
+ansiblenode1               : ok=2    changed=0    unreachable=0    failed=0
+ansiblenode2               : ok=2    changed=0    unreachable=0    failed=0
+
+[ansible@ansiblehost dev]$ ls -ltr
+total 232
+-rw-rw-r--. 1 ansible ansible    155 Jan  5 10:08 ansible.cfg
+-rw-rw-r--. 1 ansible ansible     65 Jan  5 11:35 jolly
+-rw-r--r--. 1 root    root         0 Jan  5 11:53 sample.txt
+drwxrwxr-x. 2 ansible ansible     72 Jan  5 11:55 playbooks
+-rw-rw-r--. 1 ansible ansible    163 Jan  6 04:51 file.yml
+-rw-rw-r--. 1 ansible ansible    183 Jan  6 05:31 bkup-sudo.yml
+-rw-rw-r--. 1 ansible ansible    196 Jan  6 05:33 fetch.yml
+-rw-rw-r--. 1 ansible ansible    231 Jan  6 05:49 fetch_with_node.yml
+-rw-rw-r--. 1 ansible ansible    188 Jan  6 06:06 content.yml
+-rw-rw-r--. 1 ansible ansible    288 Jan  6 06:12 create_file_copy_content.yml
+-rw-rw-r--. 1 ansible ansible    146 Jan  6 06:53 copyfile.yml
+-rw-rw-r--. 1 ansible ansible    205 Jan  6 07:01 lineinfile.yml
+-rw-rw-r--. 1 ansible ansible    415 Jan  6 07:30 blockinfile.yml
+-rw-rw-r--. 1 ansible ansible     41 Jan  6 07:33 replace.yml
+-rw-rw-r--. 1 ansible ansible     26 Jan  6 07:57 tags.retry
+-rw-rw-r--. 1 ansible ansible    406 Jan  6 08:08 tags.yml
+-rw-rw-r--. 1 ansible ansible 177538 Jan  6 08:11 ansiblerun.log
+[ansible@ansiblehost dev]$

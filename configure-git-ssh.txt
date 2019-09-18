@@ -1,0 +1,40 @@
+# Step1: Configure github repo for ssh connection
+
+ssh-keygen -t rsa -C "github-chefgs" -f "github-chefgs"
+
+# Step 2: Configure SSH
+# In ~/.ssh/ create a file called config with contents based on this:
+
+#chefgs account
+Host github.com-chefgs
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/github-chefgs
+
+# Step 3A: Add the public key sign into github repo
+# Step 3B: Add the public key sign of ur computer in which the clone occurs
+	
+# Step 4A: When cloning for the first time
+# You can clone an existing GitHub repo if you don’t already have a local copy. The following syntax will ensure the remote is configured correctly to work with our setup:
+
+git clone git@github.com-chefgs:chefgs/your-repo-name.git your-repo-name_user1
+git clone git@github.com-chefgs:chefgs/playbook_repo.git playbook_repo_chefgs
+
+#Step 4B: IF the repo already cloned - use below command
+# Assuming you want to update origin you’ll need to do:
+
+git remote set-url origin git@github.com-user1:user1/your-repo-name.git
+--------------------------------------------------------------------------
+
+# Steps for adding private git repo to ansible
+# Generate public / private key for git-username
+Execute below from ~/.ssh directory (either from your ansible tower server or any linux server)
+ssh-keygen -t rsa -C "github-username" -f "github-username"
+
+Command generates .pub abd private key files
+
+# Add the public key into github SSH settings
+
+# Add private key in Ansible tower new credential
+Follow the steps below to  
+
